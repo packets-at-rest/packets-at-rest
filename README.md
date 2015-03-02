@@ -16,9 +16,9 @@ daemonlogger -i em0 -l /data/pcap/ -n pcap -t 60
 Edit options in config.rb. For example:
 
 ````
-CAPTUREDIR = '/data/pcap'
+CAPTUREDIR = '/data/pcap' # daemonlogger -l option
 FILERDIR = '/data/filed'
-FILEPREFIX = 'pcap'
+FILEPREFIX = 'pcap' # daemonlogger -n option
 PRINTF = '/usr/bin/printf'
 TCPDUMP = '/usr/sbin/tcpdump'
 ````

@@ -1,6 +1,5 @@
 require 'sinatra/base'
 require 'chronic'
-require 'json'
 
 require_relative 'config'
 
@@ -11,49 +10,83 @@ module PacketsAtRest
     get '/data.pcap' do
       keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
       if not keys.reduce(true){ |memo, param| memo && params.key?(param) }
-        content_type 'text/html'
-        return [404, 'must provide all six parameters: src_addr, src_port, dst_addr, dst_port, start_time, end_time']
+        return badrequest 'must provide all six parameters: src_addr, src_port, dst_addr, dst_port, start_time, end_time'
+      end
+
+      # input validation
+      valid_msg = ''
+      src_port = nil
+      begin
+        src_port = Integer(params['src_port'], 10)
+      rescue
+      end
+      valid_msg += 'invalid source port. ' if src_port == nil or src_port < 0 or src_port > 65535
+      dst_port = nil
+      begin
+        dst_port = Integer(params['src_port'], 10)
+      rescue
+      end
+      valid_msg += 'invalid destination port. ' if dst_port == nil or dst_port < 0 or dst_port > 65535
+      start_dt = Chronic.parse(params['start_time'])
+      valid_msg += 'invalid start time. ' if start_dt == nil
+      end_dt = Chronic.parse(params['end_time'])
+      valid_msg += 'invalid end time. ' if end_dt == nil
+      if not valid_msg.empty?
+        return badrequest valid_msg.chop
       end
 
       filter = "host #{params['src_addr']} and host #{params['dst_addr']} and port #{params['src_port']} and port #{params['dst_port']}"
-      files = PacketsAtRest.filelist(params['start_time'], params['end_time'])
+      files = filelist(start_dt, end_dt)
       command = "#{PRINTF} \"#{files.join('\n')}\\n\" | #{TCPDUMP} -V - -w - \"#{filter}\""
       puts command
+
+      if files.empty?
+        return notfound 'no capture data for that timeframe'
+      end
 
       content_type 'application/pcap'
       return [200, `#{command}`]
     end
 
     get '/*' do
-      content_type 'text/html'
-      return [400, 'request data from /data.pcap']
+      return badrequest 'request data from /data.pcap'
     end
 
-    def PacketsAtRest.filelist start_str, end_str
-      # ensure boundary minutes are included by subtracting/adding a minute
-      start_dt = Chronic.parse(start_str) - 60
-      end_dt = Chronic.parse(end_str) + 60
+    def notfound msg
+      content_type 'text/html'
+      [404, msg]
+    end
 
-      start_d = start_dt.to_date
-      end_d = end_dt.to_date
+    def badrequest msg
+      content_type 'text/html'
+      [400, msg]
+    end
+
+    def filelist start_dt, end_dt
+      # ensure boundary minutes are included by subtracting/adding a minute
+      adj_start_dt = start_dt - 60
+      adj_end_dt = end_dt + 60
+
+      start_d = adj_start_dt.to_date
+      end_d = adj_end_dt.to_date
 
       dirs = []
 
       if start_d == end_d
-        (start_dt.hour .. end_dt.hour).each do |hour|
-          dirs << "#{FILERDIR}/#{start_dt.year}/#{start_dt.month}/#{start_dt.day}/#{hour}/"
+        (adj_start_dt.hour .. adj_end_dt.hour).each do |hour|
+          dirs << "#{FILERDIR}/#{adj_start_dt.year}/#{adj_start_dt.month}/#{adj_start_dt.day}/#{hour}/"
         end
       else
-        (start_dt.hour .. 23).each do |hour|
-          dirs << "#{FILERDIR}/#{start_dt.year}/#{start_dt.month}/#{start_dt.day}/#{hour}/"
+        (adj_start_dt.hour .. 23).each do |hour|
+          dirs << "#{FILERDIR}/#{adj_start_dt.year}/#{adj_start_dt.month}/#{adj_start_dt.day}/#{hour}/"
         end
         (start_d .. end_d).to_a[1...-1].each do |date|
           (0 .. 23).each do |hour|
             dirs << "#{FILERDIR}/#{date.year}/#{date.month}/#{date.day}/#{hour}/"
           end
         end
-        (0 .. end_dt.hour).each do |hour|
-          dirs << "#{FILERDIR}/#{end_dt.year}/#{end_dt.month}/#{end_dt.day}/#{hour}/"
+        (0 .. adj_end_dt.hour).each do |hour|
+          dirs << "#{FILERDIR}/#{adj_end_dt.year}/#{adj_end_dt.month}/#{adj_end_dt.day}/#{hour}/"
         end
       end
 
@@ -63,13 +96,13 @@ module PacketsAtRest
         Dir["#{dirs.first}/*"].sort.each do |path|
           file = File.basename(path)
           unixtime = file.sub(/#{FILEPREFIX}\./, '').to_i
-          files << path if unixtime >= start_dt.to_i and unixtime <= end_dt.to_i
+          files << path if unixtime >= adj_start_dt.to_i and unixtime <= adj_end_dt.to_i
         end
       else
         Dir["#{dirs.first}/*"].sort.each do |path|
           file = File.basename(path)
           unixtime = file.sub(/#{FILEPREFIX}\./, '').to_i
-          files << path if unixtime >= start_dt.to_i and unixtime <= end_dt.to_i
+          files << path if unixtime >= adj_start_dt.to_i and unixtime <= adj_end_dt.to_i
         end
         dirs.to_a[1...-1].each do |dir|
           Dir["#{dir}/*"].sort.each do |path|
@@ -79,7 +112,7 @@ module PacketsAtRest
         Dir["#{dirs.last}/*"].sort.each do |path|
           file = File.basename(path)
           unixtime = file.sub(/#{FILEPREFIX}\./, '').to_i
-          files << path if unixtime >= start_dt.to_i and unixtime <= end_dt.to_i
+          files << path if unixtime >= adj_start_dt.to_i and unixtime <= adj_end_dt.to_i
         end
       end
 
