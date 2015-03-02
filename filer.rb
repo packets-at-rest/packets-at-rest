@@ -1,5 +1,6 @@
 require 'fileutils'
 require_relative 'config'
+require_relative 'util'
 
 module PacketsAtRest
 
@@ -11,7 +12,7 @@ module PacketsAtRest
       unixtime = file.sub(/#{FILEPREFIX}\./, '').to_i
       datetime = Time.at(unixtime)
       puts "Moving #{file} (#{datetime})"
-      newpath = "#{FILERDIR}/#{datetime.year}/#{datetime.month}/#{datetime.day}/#{datetime.hour}/"
+      newpath = "#{FILERDIR}/#{datetime.year}/#{datetime.month.pad2}/#{datetime.day.pad2}/#{datetime.hour.pad2}/"
       FileUtils.mkpath(newpath)
       FileUtils.mv(filepath, newpath)
     end

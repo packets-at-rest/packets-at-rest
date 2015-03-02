@@ -1,7 +1,7 @@
 require 'sinatra/base'
 require 'chronic'
-
 require_relative 'config'
+require_relative 'util'
 
 module PacketsAtRest
 
@@ -23,7 +23,7 @@ module PacketsAtRest
       valid_msg += 'invalid source port. ' if src_port == nil or src_port < 0 or src_port > 65535
       dst_port = nil
       begin
-        dst_port = Integer(params['src_port'], 10)
+        dst_port = Integer(params['dst_port'], 10)
       rescue
       end
       valid_msg += 'invalid destination port. ' if dst_port == nil or dst_port < 0 or dst_port > 65535
@@ -74,19 +74,19 @@ module PacketsAtRest
 
       if start_d == end_d
         (adj_start_dt.hour .. adj_end_dt.hour).each do |hour|
-          dirs << "#{FILERDIR}/#{adj_start_dt.year}/#{adj_start_dt.month}/#{adj_start_dt.day}/#{hour}/"
+          dirs << "#{FILERDIR}/#{adj_start_dt.year}/#{adj_start_dt.month.pad2}/#{adj_start_dt.day.pad2}/#{hour.pad2}/"
         end
       else
         (adj_start_dt.hour .. 23).each do |hour|
-          dirs << "#{FILERDIR}/#{adj_start_dt.year}/#{adj_start_dt.month}/#{adj_start_dt.day}/#{hour}/"
+          dirs << "#{FILERDIR}/#{adj_start_dt.year}/#{adj_start_dt.month.pad2}/#{adj_start_dt.day.pad2}/#{hour.pad2}/"
         end
         (start_d .. end_d).to_a[1...-1].each do |date|
           (0 .. 23).each do |hour|
-            dirs << "#{FILERDIR}/#{date.year}/#{date.month}/#{date.day}/#{hour}/"
+            dirs << "#{FILERDIR}/#{date.year}/#{date.month.pad2}/#{date.day.pad2}/#{hour.pad2}/"
           end
         end
         (0 .. adj_end_dt.hour).each do |hour|
-          dirs << "#{FILERDIR}/#{adj_end_dt.year}/#{adj_end_dt.month}/#{adj_end_dt.day}/#{hour}/"
+          dirs << "#{FILERDIR}/#{adj_end_dt.year}/#{adj_end_dt.month.pad2}/#{adj_end_dt.day.pad2}/#{hour.pad2}/"
         end
       end
 
