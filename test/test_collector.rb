@@ -14,6 +14,47 @@ class CollectorTest < Test::Unit::TestCase
   ONEKEY = '096dbfe4-a38f-4495-a0f4-f852dc982d50'
   TWOKEY = '27ee688c-c412-43f8-ad67-ee5287b59e80'
 
+  # /data.pcap
+  def test_get_pcap_without_api_key
+    get "/data.pcap"
+    json = JSON.parse(last_response.body)
+    assert(!last_response.ok?, 'should not be ok')
+    assert_block('should return an error with a message') {
+      json['type'] == 'error' and json.key? 'message'
+    }
+  end
+
+  def test_get_pcap_without_node_id
+    get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{MASTERKEY}"
+    json = JSON.parse(last_response.body)
+    assert(!last_response.ok?, 'should not be ok')
+    assert_block('should return an error with a message') {
+      json['type'] == 'error' and json.key? 'message'
+    }
+  end
+
+  def test_get_pcap_without_access_to_node
+    get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{ONEKEY}&node_id=2"
+    json = JSON.parse(last_response.body)
+    assert(!last_response.ok?, 'should not be ok')
+    assert_block('should return an error with a message') {
+      json['type'] == 'error' and json.key? 'message'
+    }
+  end
+
+  def test_get_pcap_for_unknown_node
+    get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{MASTERKEY}&node_id=10"
+    json = JSON.parse(last_response.body)
+    assert(!last_response.ok?, 'should not be ok')
+    assert_block('should return an error with a message') {
+      json['type'] == 'error' and json.key? 'message'
+    }
+  end
+
+  def test_get_pcap_url
+    # TODO
+  end
+
   # /keys
   def test_get_keys_without_api_key
     get "/keys"

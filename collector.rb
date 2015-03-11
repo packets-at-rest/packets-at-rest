@@ -23,28 +23,36 @@ module PacketsAtRest
     end
 
     get '/data.pcap' do
-      packet_keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
-      other_keys = ['api_key', 'node_id']
-      missing_keys = (packet_keys + other_keys).select { |k| !params.key? k }
-      if not missing_keys.empty?
-        return badrequest "must provide missing parameters: #{missing_keys.join(', ')}"
-      end
+      begin
+        packet_keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
+        other_keys = ['api_key', 'node_id']
+        missing_keys = (packet_keys + other_keys).select { |k| !params.key? k }
+        if not missing_keys.empty?
+          return badrequest "must provide missing parameters: #{missing_keys.join(', ')}"
+        end
 
-      nodes = lookup_nodes_by_api_key(params['api_key'])
-      if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
-        return forbidden 'api_key not allowed to request this resource'
-      end
+        nodes = lookup_nodes_by_api_key(params['api_key'])
+        if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
+          return forbidden 'api_key not allowed to request this resource'
+        end
 
-      node_address = lookup_nodeaddress_by_id params['node_id']
-      if not node_address
-        return badrequest 'unknown node'
-      end
+        node_address = lookup_nodeaddress_by_id params['node_id']
+        if not node_address
+          return badrequest 'unknown node'
+        end
 
-      content_type 'application/pcap'
-      query = (packet_keys << 'api_key').collect{ |k| "#{k}=#{params[k]}" }.join('&')
-      uri = URI.encode("#{REQUESTPREFIX}#{node_address}/data.pcap?#{query}")
-      RestClient.get(uri) do |response, request, result|
-        [response.code, response.body]
+        query = (packet_keys << 'api_key').collect{ |k| "#{k}=#{params[k]}" }.join('&')
+        uri = URI.encode("#{REQUESTPREFIX}#{node_address}/data.pcap?#{query}")
+        RestClient.get(uri) do |response, request, result|
+          if response.code == 200
+            content_type 'application/pcap'
+          else
+            content_type :json
+          end
+          return [response.code, response.body]
+        end
+      rescue
+        return internalerror 'there was a problem requesting from the node'
       end
     end
 
@@ -77,21 +85,25 @@ module PacketsAtRest
     end
 
     get '/nodes/:node_id/ping' do
-      content_type :json
+      begin
+        content_type :json
 
-      nodes = lookup_nodes_by_api_key(params['api_key'])
-      if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
-        return forbidden 'api_key not allowed to request this resource'
-      end
+        nodes = lookup_nodes_by_api_key(params['api_key'])
+        if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
+          return forbidden 'api_key not allowed to request this resource'
+        end
 
-      node_address = lookup_nodeaddress_by_id params['node_id']
-      if not node_address
-        return badrequest 'unknown node'
-      end
+        node_address = lookup_nodeaddress_by_id params['node_id']
+        if not node_address
+          return badrequest 'unknown node'
+        end
 
-      uri = URI.encode("#{REQUESTPREFIX}#{node_address}/ping")
-      RestClient.get(uri) do |response, request, result|
-        [response.code, response.body]
+        uri = URI.encode("#{REQUESTPREFIX}#{node_address}/ping")
+        RestClient.get(uri) do |response, request, result|
+          [response.code, response.body]
+        end
+      rescue
+        return internalerror 'there was a problem requesting from the node'
       end
     end
 
