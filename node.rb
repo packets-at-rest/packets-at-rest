@@ -5,7 +5,7 @@ require_relative 'util'
 
 module PacketsAtRest
 
-  class Server < Sinatra::Base
+  class Node < Sinatra::Base
 
     get '/data.pcap' do
       keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']

@@ -1,10 +1,10 @@
 module PacketsAtRest
 
   # directory in which daemonlogger writes files (daemonlogger -l option)
-  CAPTUREDIR = '/data/pcap'
+  CAPTUREDIR = 'data/pcap'
 
   # directory in which filer should file pcaps
-  FILERDIR = '/data/filed'
+  FILERDIR = 'data/filed'
 
   # daemonlogger capture file prefix (daemonlogger -n option)
   FILEPREFIX = 'pcap'
@@ -16,11 +16,12 @@ module PacketsAtRest
   TCPDUMP = '/usr/sbin/tcpdump'
 
   # node specification
-  NODEFILE = 'nodes.conf'
+  NODEFILE = 'test/nodes.conf'
 
   # api specification
-  APIFILE = 'api.conf'
+  APIFILE = 'test/api.conf'
 
   # node request prefix
   REQUESTPREFIX = 'http://'
+
 end
