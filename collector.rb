@@ -44,7 +44,10 @@ module PacketsAtRest
       query = (packet_keys << 'api_key').collect{ |k| "#{k}=#{params[k]}" }.join('&')
       uri = URI.encode("#{REQUESTPREFIX}#{node_address}/data.pcap?#{query}")
       puts uri
-      return RestClient.get(uri).body
+
+      RestClient.get(uri) do |response, request, result|
+        [response.code, response.body]
+      end
     end
 
     get '/keys' do
