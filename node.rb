@@ -1,11 +1,11 @@
-require 'sinatra/base'
 require 'chronic'
+require_relative 'pingable_server'
 require_relative 'config'
 require_relative 'util'
 
 module PacketsAtRest
 
-  class Node < Sinatra::Base
+  class Node < PingableServer
 
     get '/data.pcap' do
       keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
@@ -46,20 +46,6 @@ module PacketsAtRest
 
       content_type 'application/pcap'
       return [200, `#{command}`]
-    end
-
-    get '/*' do
-      return badrequest 'request data from /data.pcap'
-    end
-
-    def notfound msg
-      content_type 'text/html'
-      [404, msg]
-    end
-
-    def badrequest msg
-      content_type 'text/html'
-      [400, msg]
     end
 
     def filelist start_dt, end_dt

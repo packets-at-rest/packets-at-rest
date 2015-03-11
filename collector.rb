@@ -1,15 +1,15 @@
-require 'sinatra/base'
 require 'chronic'
 require 'json'
 require 'sys/uptime'
 require 'rest_client'
 require 'uri'
+require_relative 'pingable_server'
 require_relative 'config'
 require_relative 'util'
 
 module PacketsAtRest
 
-  class Collector < Sinatra::Base
+  class Collector < PingableServer
 
     before do
       begin
@@ -31,7 +31,7 @@ module PacketsAtRest
       end
 
       nodes = lookup_nodes_by_api_key(params['api_key'])
-      if !nodes.include? "0" and !nodes.include? params['node_id']
+      if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
         return forbidden 'api_key not allowed to request this resource'
       end
 
@@ -43,8 +43,6 @@ module PacketsAtRest
       content_type 'application/pcap'
       query = (packet_keys << 'api_key').collect{ |k| "#{k}=#{params[k]}" }.join('&')
       uri = URI.encode("#{REQUESTPREFIX}#{node_address}/data.pcap?#{query}")
-      puts uri
-
       RestClient.get(uri) do |response, request, result|
         [response.code, response.body]
       end
@@ -64,18 +62,6 @@ module PacketsAtRest
       end
     end
 
-    get '/ping' do
-      content_type :json
-      begin
-        return {
-          "uptime" => Sys::Uptime.uptime,
-          "date" => Time.now
-        }.to_json
-      rescue
-        return internalerror 'there was a problem getting uptime and date'
-      end
-    end
-
     get '/nodes/list' do
       content_type :json
       begin
@@ -90,45 +76,23 @@ module PacketsAtRest
       end
     end
 
-    get '/nodes/:id/ping' do
+    get '/nodes/:node_id/ping' do
       content_type :json
-      # ping node params[:id]
-    end
 
-    get '/*' do
-      return badrequest 'this request is not supported'
-    end
+      nodes = lookup_nodes_by_api_key(params['api_key'])
+      if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
+        return forbidden 'api_key not allowed to request this resource'
+      end
 
-    def error_message msg
-      {
-        "type" => "error",
-        "message" => msg
-      }.to_json
-    end
+      node_address = lookup_nodeaddress_by_id params['node_id']
+      if not node_address
+        return badrequest 'unknown node'
+      end
 
-    def notfound msg
-      content_type :json
-      [404, error_message(msg)]
-    end
-
-    def badrequest msg
-      content_type :json
-      [400, error_message(msg)]
-    end
-
-    def unauthorized msg
-      content_type :json
-      [401, error_message(msg)]
-    end
-
-    def forbidden msg
-      content_type :json
-      [403, error_message(msg)]
-    end
-
-    def internalerror msg
-      content_type :json
-      [500, error_message(msg)]
+      uri = URI.encode("#{REQUESTPREFIX}#{node_address}/ping")
+      RestClient.get(uri) do |response, request, result|
+        [response.code, response.body]
+      end
     end
 
     def lookup_nodes_by_api_key api_key
