@@ -20,7 +20,7 @@ class CollectorTest < Test::Unit::TestCase
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
     assert_block('should return an error with a message') {
-      json['type'] == 'error' and json.key? 'message'
+      json.key? 'error'
     }
   end
 
@@ -29,7 +29,7 @@ class CollectorTest < Test::Unit::TestCase
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
     assert_block('should return an error with a message') {
-      json['type'] == 'error' and json.key? 'message'
+      json.key? 'error'
     }
   end
 
@@ -38,7 +38,7 @@ class CollectorTest < Test::Unit::TestCase
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
     assert_block('should return an error with a message') {
-      json['type'] == 'error' and json.key? 'message'
+      json.key? 'error'
     }
   end
 
@@ -47,7 +47,7 @@ class CollectorTest < Test::Unit::TestCase
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
     assert_block('should return an error with a message') {
-      json['type'] == 'error' and json.key? 'message'
+      json.key? 'error'
     }
   end
 
@@ -61,7 +61,7 @@ class CollectorTest < Test::Unit::TestCase
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
     assert_block('should return an error with a message') {
-      json['type'] == 'error' and json.key? 'message'
+      json.key? 'error'
     }
   end
 
@@ -80,7 +80,7 @@ class CollectorTest < Test::Unit::TestCase
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
     assert_block('should return an error with a message') {
-      json['type'] == 'error' and json.key? 'message'
+      json.key? 'error'
     }
   end
 

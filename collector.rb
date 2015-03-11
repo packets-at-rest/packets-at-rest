@@ -42,7 +42,7 @@ module PacketsAtRest
         end
 
         query = (packet_keys << 'api_key').collect{ |k| "#{k}=#{params[k]}" }.join('&')
-        uri = URI.encode("#{REQUESTPREFIX}#{node_address}/data.pcap?#{query}")
+        uri = URI.encode("http://#{node_address}/data.pcap?#{query}")
         RestClient.get(uri) do |response, request, result|
           if response.code == 200
             content_type 'application/pcap'
@@ -98,7 +98,7 @@ module PacketsAtRest
           return badrequest 'unknown node'
         end
 
-        uri = URI.encode("#{REQUESTPREFIX}#{node_address}/ping")
+        uri = URI.encode("http://#{node_address}/ping")
         RestClient.get(uri) do |response, request, result|
           [response.code, response.body]
         end

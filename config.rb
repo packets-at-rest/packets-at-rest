@@ -20,7 +20,4 @@ module PacketsAtRest
 
   # api specification
   APIFILE = 'api.conf'
-
-  # node request prefix
-  REQUESTPREFIX = 'http://'
 end

@@ -21,8 +21,7 @@ module PacketsAtRest
 
     def error_message msg
       {
-        "type" => "error",
-        "message" => msg
+        "error" => msg
       }.to_json
     end
 
