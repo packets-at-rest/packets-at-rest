@@ -1,7 +1,7 @@
 # test.rb
 require File.expand_path '../test_helper.rb', __FILE__
 
-class CollectorTest < Test::Unit::TestCase
+class CollectorTest < MiniTest::Unit::TestCase
   include Rack::Test::Methods
 
   def app
@@ -17,7 +17,7 @@ class CollectorTest < Test::Unit::TestCase
     get "/data.pcap"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert_block('should return an error with a message') {
+    assert('should return an error with a message') {
       json.key? 'error'
     }
   end
@@ -26,7 +26,7 @@ class CollectorTest < Test::Unit::TestCase
     get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{MASTERKEY}"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert_block('should return an error with a message') {
+    assert('should return an error with a message') {
       json.key? 'error'
     }
   end
@@ -35,7 +35,7 @@ class CollectorTest < Test::Unit::TestCase
     get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{ONEKEY}&node_id=2"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert_block('should return an error with a message') {
+    assert('should return an error with a message') {
       json.key? 'error'
     }
   end
@@ -44,7 +44,7 @@ class CollectorTest < Test::Unit::TestCase
     get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{MASTERKEY}&node_id=10"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert_block('should return an error with a message') {
+    assert('should return an error with a message') {
       json.key? 'error'
     }
   end
@@ -58,7 +58,7 @@ class CollectorTest < Test::Unit::TestCase
     get "/keys"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert_block('should return an error with a message') {
+    assert('should return an error with a message') {
       json.key? 'error'
     }
   end
@@ -67,7 +67,7 @@ class CollectorTest < Test::Unit::TestCase
     get "/keys?api_key=#{MASTERKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert_block('should return all keys') {
+    assert('should return all keys') {
       json.count == 4 and json.key? '27ee688c-c412-43f8-ad67-ee5287b59e80'
     }
   end
@@ -77,7 +77,7 @@ class CollectorTest < Test::Unit::TestCase
     get "/ping"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert_block('should return an error with a message') {
+    assert('should return an error with a message') {
       json.key? 'error'
     }
   end
@@ -86,7 +86,7 @@ class CollectorTest < Test::Unit::TestCase
     get "/ping?api_key=#{MASTERKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert_block('should return uptime and date') {
+    assert('should return uptime and date') {
       json.key? 'uptime' and json.key? 'date'
     }
   end
@@ -96,7 +96,7 @@ class CollectorTest < Test::Unit::TestCase
     get "/nodes/list?api_key=#{MASTERKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert_block('should return keys it has access to') {
+    assert('should return keys it has access to') {
       json.count == 2 and json.key? '1' and json.key? '2'
     }
   end
@@ -105,10 +105,10 @@ class CollectorTest < Test::Unit::TestCase
     get "/nodes/list?api_key=#{ONEKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert_block('should return key it has access to') {
+    assert('should return key it has access to') {
       json.count == 1 and json.key? '1'
     }
-    assert_block('should not return key it does not have access to') {
+    assert('should not return key it does not have access to') {
       json.count == 1 and !json.key? '2' and !json.key? '0'
     }
   end
@@ -117,7 +117,7 @@ class CollectorTest < Test::Unit::TestCase
     get "/nodes/list?api_key=#{TWOKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert_block('should return keys it has access to') {
+    assert('should return keys it has access to') {
       json.count == 2 and json.key? '1' and json.key? '2'
     }
   end

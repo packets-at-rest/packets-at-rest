@@ -1,7 +1,7 @@
 # test_helper.rb
 ENV['RACK_ENV'] = 'test'
 
-require 'test/unit'
+require 'minitest/autorun'
 require 'rack/test'
 require "codeclimate-test-reporter"
 
