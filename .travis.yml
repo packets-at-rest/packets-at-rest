@@ -1,0 +1,17 @@
+language: ruby
+
+before_install: "gem install bundler"
+install:
+  - sudo apt-get install -qq libpcap-dev tcpdump
+  - "bundle install"
+
+script: "rake"
+
+rvm:
+  - 1.9.3
+  - 2.0.0
+  - 2.1.1
+
+addons:
+  code_climate:
+    repo_token: 1eabbd0b18fc8d0b4213ec0726de594dee4b4a1f2459829422d52b8c8c3a0757
