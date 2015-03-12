@@ -1,10 +1,5 @@
-require 'test/unit'
-require 'rack/test'
-require_relative '../collector.rb'
-require_relative 'config.rb'
-
-require "codeclimate-test-reporter"
-CodeClimate::TestReporter.start
+# test.rb
+require File.expand_path '../test_helper.rb', __FILE__
 
 class CollectorTest < Test::Unit::TestCase
   include Rack::Test::Methods
