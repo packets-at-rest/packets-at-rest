@@ -4,9 +4,9 @@ Packets at Rest is a RESTful web interface to pcap data on distributed network s
 
 ## Build Status
 
-[![Build Status](https://travis-ci.org/shadowbq/packets-at-rest.svg)](https://travis-ci.org/shadowbq/packets-at-rest)
-[![Code Climate](https://codeclimate.com/github/shadowbq/packets-at-rest/badges/gpa.svg)](https://codeclimate.com/github/shadowbq/packets-at-rest)
-[![Test Coverage](https://codeclimate.com/github/shadowbq/packets-at-rest/badges/coverage.svg)](https://codeclimate.com/github/shadowbq/packets-at-rest)
+[![Build Status](https://travis-ci.org/packets-at-rest/packets-at-rest.svg)](https://travis-ci.org/packets-at-rest/packets-at-rest)
+[![Code Climate](https://codeclimate.com/github/packets-at-rest/packets-at-rest/badges/gpa.svg)](https://codeclimate.com/github/packets-at-rest/packets-at-rest)
+[![Test Coverage](https://codeclimate.com/github/packets-at-rest/packets-at-rest/badges/coverage.svg)](https://codeclimate.com/github/packets-at-rest/packets-at-rest)
 
 ## Environment and Dependencies
 Suggested operating system is FreeBSD.
