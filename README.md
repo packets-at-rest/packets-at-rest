@@ -24,7 +24,7 @@ Start daemonlogger. For example:
 daemonlogger -i em0 -l /data/pcap/ -n pcap -t 60
 ```
 
-Edit options in config.rb. For example:
+Edit options in `config/config.rb`. For example:
 
 ```
 CAPTUREDIR = '/data/pcap' # daemonlogger -l option
@@ -46,7 +46,7 @@ rackup node.ru -p 9002
 
 ### Collector
 
-Edit APIFILE (api.conf) to give API keys access to nodes. API key with access to node "0" has access to all nodes. For example:
+Edit APIFILE `config/api.conf` to give API keys access to nodes. API key with access to node "0" has access to all nodes. For example:
 
 ```json
 {
@@ -54,7 +54,7 @@ Edit APIFILE (api.conf) to give API keys access to nodes. API key with access to
 }
 ```
 
-Edit NODEFILE (nodes.conf) to associate node numbers with their addresses. For example:
+Edit NODEFILE `config/nodes.conf` to associate node numbers with their addresses. For example:
 
 ```json
 {
@@ -77,4 +77,3 @@ http://127.0.0.1:9001/data.pcap?src_addr=1.1.1.1&src_port=111&dst_addr=2.2.2.2&d
 ### Data Flow
 
 ![diagram](https://raw.github.com/packets-at-rest/packets-at-rest/cdn-images/diagram.png)
-

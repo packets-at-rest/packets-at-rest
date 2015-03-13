@@ -1,7 +1,7 @@
 require 'chronic'
-require_relative 'pingable_server'
-require_relative 'config'
-require_relative 'util'
+require_relative '../lib/pingable_server'
+require_relative '../config/config'
+require_relative '../lib/util'
 
 module PacketsAtRest
 
@@ -104,7 +104,7 @@ module PacketsAtRest
 
       files
     end
-    
+
   end
 
 end

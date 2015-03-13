@@ -1,4 +1,4 @@
 require 'bundler'
 Bundler.require
-require_relative 'collector'
+require_relative 'collector/collector'
 run PacketsAtRest::Collector

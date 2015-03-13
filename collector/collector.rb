@@ -3,9 +3,9 @@ require 'json'
 require 'sys/uptime'
 require 'rest_client'
 require 'uri'
-require_relative 'pingable_server'
-require_relative 'config'
-require_relative 'util'
+require_relative '../lib/pingable_server'
+require_relative '../config/config'
+require_relative '../lib/util'
 
 module PacketsAtRest
 

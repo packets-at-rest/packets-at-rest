@@ -10,4 +10,5 @@ group :test do
     gem 'rake', require: nil
     gem 'rack-test', require: nil
     gem "codeclimate-test-reporter", require: nil
+    gem "minitest-reporters", require: nil
 end
