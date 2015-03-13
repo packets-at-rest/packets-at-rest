@@ -75,4 +75,5 @@ http://127.0.0.1:9001/data.pcap?src_addr=1.1.1.1&src_port=111&dst_addr=2.2.2.2&d
 
 ### Data Flow
 
-![diagram](https://raw.github.com/shadowbq/packets-at-rest/screenshots/diagram.png)
+![diagram](https://raw.github.com/packets-at-rest/packets-at-rest/cdn-images/diagram.png)
+
