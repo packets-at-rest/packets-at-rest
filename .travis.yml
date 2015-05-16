@@ -1,6 +1,9 @@
+sudo: required
 language: ruby
 
-before_install: "gem install bundler"
+before_install: 
+  - "gem install bundler"
+  - sudo apt-get update -qq
 install:
   - sudo apt-get install -qq libpcap-dev tcpdump
   - "bundle install"
