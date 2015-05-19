@@ -27,5 +27,5 @@ end
 desc "release TAG #{PacketsAtRest::VERSION} to github"
 task :release do
     system("git tag -a #{PacketsAtRest::VERSION} -m 'release tag #{PacketsAtRest::VERSION}'")
-    system("git push origin master")
+    system("git push origin #{PacketsAtRest::VERSION}")
 end
