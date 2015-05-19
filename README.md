@@ -1,5 +1,7 @@
 # packets-at-rest
 
+[![GitHub release](https://img.shields.io/github/release/packets-at-rest/packets-at-rest.svg)]()
+
 Packets at Rest is a RESTful web interface to pcap data on distributed network sensors through the use of IPFIX flow tuples and simple API rolebased access controls.
 
 ## Build Status
