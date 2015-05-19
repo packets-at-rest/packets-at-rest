@@ -17,9 +17,52 @@ Suggested operating system is FreeBSD.
 System dependencies include:
 * net/daemonlogger
 
-## Usage
+Although the Collector and the Node can exist on the same server we recommend a HA of Collectors with x-N Nodes. Collectors in a HA configuration are not aware of each other, and should be targeted via Round Robin DNS queries.
+
+* https://www.digitalocean.com/community/tutorials/how-to-configure-dns-round-robin-load-balancing-for-high-availability
+
+## Dependency Information
+
+The Ruby based API is powered by sinatra and rack.
+
+* http://www.sinatrarb.com/
+* http://rack.github.io/
+
+Packets-at-REST recommends a quality well test web server like nginx with phusion passenger.
+* https://www.phusionpassenger.com/
+* http://wiki.nginx.org/Main
+* (NGINX+Phusion Passenger)(https://www.phusionpassenger.com/documentation/Users%20guide%20Nginx.html)
+
+
+## Installation
+
+```shell
+$> Bundle install
+```
+
+```shell
+$> rake -T
+rake bump:current    # Show current gem version
+rake bump:major      # Bump major part of gem version
+rake bump:minor      # Bump minor part of gem version
+rake bump:patch      # Bump patch part of gem version
+rake bump:pre        # Bump pre part of gem version
+rake release         # release TAG 0.1.1 to github
+rake role_collector  # Set Role Collector
+rake role_node       # Set Role Node
+rake test            # Run tests
+```
+
+Setup the mode (node|collector) for the server.
+
+```
+$> rake role_collector
+```
 
 ### Node
+
+The node is responsible for capturing the network data, storing it, and making it available to the 'node' webapp api.
+
 Start daemonlogger. For example:
 
 ```shell
@@ -43,7 +86,8 @@ Schedule the filer. For example, in crontab:
 Start the node. For example:
 
 ```shell
-rackup node.ru -p 9002
+rake role_node
+rackup config.ru -p 9002
 ```
 
 ### Collector
@@ -67,7 +111,8 @@ Edit NODEFILE `config/nodes.conf` to associate node numbers with their addresses
 Start the collector. For example:
 
 ```shell
-rackup collector.ru -p 9001
+rake role_collector
+rackup config.ru -p 9001
 ```
 
 Make a request. For example:
