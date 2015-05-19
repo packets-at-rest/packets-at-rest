@@ -24,8 +24,8 @@ task :role_collector do
     FileUtils.ln_s 'collector.ru', 'config.ru', :force => true
 end
 
-desc 'release TAG to github'
+desc "release TAG #{PacketsAtRest::VERSION} to github"
 task :release do
-    `git tag -a #{PacketsAtRest::VERSION} -m 'release tag #{PacketsAtRest::VERSION}'`
-    `git push origin master`
+    system("git tag -a #{PacketsAtRest::VERSION} -m 'release tag #{PacketsAtRest::VERSION}'")
+    system("git push origin master")
 end
