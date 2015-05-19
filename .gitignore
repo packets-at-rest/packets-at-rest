@@ -9,7 +9,10 @@ Gemfile.lock
 InstalledFiles
 _yardoc
 coverage
+
 config.ru
+config/*.conf
+
 doc/
 lib/bundler/man
 pkg

@@ -7,6 +7,7 @@ gem 'sys-uptime', '~> 0.6.2'
 gem 'rest-client', '~> 1.8.0'
 
 group :test do
+    gem 'bump', '~> 0.3', require: nil
     gem 'rake', require: nil
     gem 'rack-test', require: nil
     gem "codeclimate-test-reporter", require: nil
