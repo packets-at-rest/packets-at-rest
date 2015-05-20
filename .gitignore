@@ -20,7 +20,7 @@ rdoc
 spec/reports
 tests/tmp
 tests/version_tmp
-tmp
+
 log/*.log
 data/*
 

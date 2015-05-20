@@ -92,6 +92,16 @@ rackup config.ru -p 9002
 
 ### Collector
 
+API keys are UUID codes. You can create a secure UUID with ruby.
+
+```ruby
+$> irb
+2.1.2 :001 > require 'securerandom'
+ => true
+2.1.2 :002 > SecureRandom.uuid
+ => "54b22f56-9a84-4893-bc70-332e3b5ded66"
+```
+
 Edit APIFILE `config/api.conf` to give API keys access to nodes. API key with access to node "0" has access to all nodes. For example:
 
 ```json
