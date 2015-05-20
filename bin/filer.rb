@@ -13,7 +13,7 @@ module PacketsAtRest
       datetime = Time.at(unixtime)
       puts "Moving #{file} (#{datetime})"
       newpath = "#{FILERDIR}/#{datetime.year}/#{datetime.month.pad2}/#{datetime.day.pad2}/#{datetime.hour.pad2}/"
-      FileUtils.mkpath(newpath)
+      FileUtils.mkpath_p(newpath)
       FileUtils.mv(filepath, newpath)
     end
   end

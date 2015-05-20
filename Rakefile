@@ -3,8 +3,12 @@ require "./lib/version"
 
 require 'bundler'
 require 'rake/testtask'
-require 'bump/tasks'
 require 'fileutils'
+
+begin
+  require 'bump/tasks'
+rescue LoadError
+end
 
 task :default => :test
 

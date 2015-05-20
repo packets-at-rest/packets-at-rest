@@ -16,8 +16,8 @@ module PacketsAtRest
   TCPDUMP = '/usr/sbin/tcpdump'
 
   # node specification
-  NODEFILE = 'nodes.conf'
+  NODEFILE = 'config/nodes.conf'
 
   # api specification
-  APIFILE = 'api.conf'
+  APIFILE = 'config/api.conf'
 end

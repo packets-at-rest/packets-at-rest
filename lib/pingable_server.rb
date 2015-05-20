@@ -1,8 +1,16 @@
 require 'sinatra/base'
 require 'json'
+require 'sinatra-initializers'
 
 module PacketsAtRest
   class PingableServer < Sinatra::Base
+    register Sinatra::Initializers
+
+    set :logging, true
+    set :dump_error, true
+    set :raise_errors, true
+    set :show_exceptions, true
+
     get '/ping' do
       content_type :json
       begin
@@ -10,10 +18,10 @@ module PacketsAtRest
           "version" => PacketsAtRest::VERSION,
           "api_version" => PacketsAtRest::API_VERSION,
           "uptime" => Sys::Uptime.uptime,
-          "date" => Time.now
+          "date" => Time.now.utc
         }.to_json
       rescue
-        return internalerror 'there was a problem getting uptime and date'
+        return internalerror 'there was a problem getting heartbeat'
       end
     end
 

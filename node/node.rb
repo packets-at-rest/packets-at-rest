@@ -1,4 +1,5 @@
 require 'chronic'
+require_relative '../lib/version'
 require_relative '../lib/pingable_server'
 require_relative '../config/config'
 require_relative '../lib/util'
