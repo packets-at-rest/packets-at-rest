@@ -87,7 +87,7 @@ class CollectorTest < MiniTest::Unit::TestCase
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
     assert('should return uptime and date') {
-      json.key? 'uptime' and json.key? 'date'
+      json.key? 'uptime' and json.key? 'date' and json.key? 'version' and json.key? 'api_version'
     }
   end
 

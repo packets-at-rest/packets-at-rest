@@ -7,6 +7,8 @@ module PacketsAtRest
       content_type :json
       begin
         return {
+          "version" => PacketsAtRest::VERSION,
+          "api_version" => PacketsAtRest::API_VERSION,
           "uptime" => Sys::Uptime.uptime,
           "date" => Time.now
         }.to_json
