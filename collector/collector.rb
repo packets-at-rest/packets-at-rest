@@ -6,7 +6,7 @@ require 'uri'
 require_relative '../lib/version'
 require_relative '../lib/pingable_server'
 require_relative '../config/config'
-require_relative '../lib/util'
+require_relative '../ext/util'
 
 module PacketsAtRest
 

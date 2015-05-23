@@ -1,6 +1,6 @@
 require 'fileutils'
-require_relative 'config'
-require_relative 'util'
+require_relative '../lib/config'
+require_relative '../ext/util'
 
 module PacketsAtRest
 
