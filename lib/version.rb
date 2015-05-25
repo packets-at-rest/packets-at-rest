@@ -1,4 +1,4 @@
 module PacketsAtRest
-    VERSION = "0.2.2"
+    VERSION = "0.3.0"
     API_VERSION = "0.1.0"
 end
