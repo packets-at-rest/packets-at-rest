@@ -6,6 +6,7 @@ gem 'sinatra', '~> 1.4.5'
 gem 'sys-uptime', '~> 0.6.2'
 gem 'rest-client', '~> 1.8.0'
 gem 'sinatra-initializers', '~> 0.1.4'
+gem 'pry'
 
 group :test do
     gem 'bump', '~> 0.3', require: nil

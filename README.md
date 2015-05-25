@@ -37,8 +37,13 @@ Packets-at-REST recommends a quality well test web server like nginx with phusio
 ## Installation
 
 ```shell
-$> Bundle install
+$> wget https://github.com/packets-at-rest/packets-at-rest/archive/0.2.0.zip
+$> unzip 0.2.0.zip /opt/
+$> cd /opt/packets-at-rest/
+$> bundle install --without test
 ```
+
+Ensure that rake list task is working
 
 ```shell
 $> rake -T
@@ -77,10 +82,29 @@ FILERDIR = '/data/filed'
 FILEPREFIX = 'pcap' # daemonlogger -n option
 ````
 
-Schedule the filer. For example, in crontab:
+### Setup Filer on each Node
+
+Schedule the `filer`. For example, in crontab:
 
 ```cron
-* * * * * /usr/local/bin/ruby /git/packets-at-rest/filer.rb
+* * * * * /usr/local/bin/ruby /opt/packets-at-rest/bin/filer.rb
+```
+
+The `filer` can be simulated using the -S flag.
+
+```shell
+$> ./bin/filer.rb -S
+I, [2015-05-25T00:09:20.438741 #17996]  INFO -- : Program started.
+I, [2015-05-25T00:09:20.439001 #17996]  INFO -- : scanning /data/pcap/pcap.*
+I, [2015-05-25T00:09:20.439138 #17996]  INFO -- : Processing: pcap.1432516781
+I, [2015-05-25T00:09:20.439290 #17996]  INFO -- : Moving /data/pcap/pcap.1432516781 => /data/filed/2015/05/24/21/
+I, [2015-05-25T00:09:20.439382 #17996]  INFO -- : Processing: pcap.1432526781
+I, [2015-05-25T00:09:20.439501 #17996]  INFO -- : Moving /data/pcap/pcap.1432526781 => /data/filed/2015/05/25/00/
+I, [2015-05-25T00:09:20.439573 #17996]  INFO -- : Processing: pcap.1432526782
+I, [2015-05-25T00:09:20.439689 #17996]  INFO -- : Moving /data/pcap/pcap.1432526782 => /data/filed/2015/05/25/00/
+I, [2015-05-25T00:09:20.439862 #17996]  INFO -- : /home/shadowbq/sandbox/github-shadowbq/packets-at-rest/tmp/filer.lock removed.
+I, [2015-05-25T00:09:20.439924 #17996]  INFO -- : Program completed.
+
 ```
 
 Start the node. For example:
@@ -92,7 +116,7 @@ rackup config.ru -p 9002
 
 ### Collector
 
-API keys are UUID codes. You can create a secure UUID with ruby.
+API keys must be made for each REST client attempting to access the Packets-at-Rest system. API keys are UUID codes. You can create a secure UUID with ruby.
 
 ```ruby
 $> irb
@@ -102,11 +126,13 @@ $> irb
  => "54b22f56-9a84-4893-bc70-332e3b5ded66"
 ```
 
-Edit APIFILE `config/api.conf` to give API keys access to nodes. API key with access to node "0" has access to all nodes. For example:
+Edit APIFILE `config/api.conf` to give API keys access to nodes. API keys with access to node "0" have access to all nodes and key information. For example:
 
 ```json
 {
-    "54b22f56-9a84-4893-bc70-332e3b5ded66" : [ "0" ]
+    "54b22f56-9a84-4893-bc70-332e3b5ded66" : [ "0" ],
+    "d5c3d52e-d42c-41ff-bbfa-d3e802770ee1" : [ "1", "2" ],
+    "ce34b5ac-df85-40f0-9500-2a4a7781a6c4" : [ "2" ]
 }
 ```
 
@@ -114,7 +140,8 @@ Edit NODEFILE `config/nodes.conf` to associate node numbers with their addresses
 
 ```json
 {
-    "1" : "127.0.0.1:9002"
+    "1" : "127.0.0.1:9002",
+    "2" : "10.0.0.2:9002"
 }
 ```
 

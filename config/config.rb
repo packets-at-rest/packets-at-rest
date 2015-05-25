@@ -20,4 +20,11 @@ module PacketsAtRest
 
   # api specification
   APIFILE = 'config/api.conf'
+
+  # lock file to ensure single actions
+  LOCKFILE = File.expand_path('../../tmp/filer.lock', __FILE__)
+
+  # Are the sensors set to UTC instead of localtime?
+  UTC = false
+
 end

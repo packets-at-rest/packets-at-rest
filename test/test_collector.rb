@@ -1,5 +1,8 @@
 # test.rb
 require File.expand_path '../test_helper.rb', __FILE__
+require_relative '../collector/collector.rb'
+require_relative 'config.rb'
+
 
 class CollectorTest < MiniTest::Unit::TestCase
   include Rack::Test::Methods

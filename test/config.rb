@@ -1,10 +1,10 @@
 module PacketsAtRest
 
   # directory in which daemonlogger writes files (daemonlogger -l option)
-  CAPTUREDIR = 'data/pcap'
+  CAPTUREDIR = 'test/data/pcap'
 
   # directory in which filer should file pcaps
-  FILERDIR = 'data/filed'
+  FILERDIR = 'test/data/filed'
 
   # daemonlogger capture file prefix (daemonlogger -n option)
   FILEPREFIX = 'pcap'
@@ -23,5 +23,13 @@ module PacketsAtRest
 
   # node request prefix
   REQUESTPREFIX = 'http://'
+
+
+    # lock file to ensure single actions
+    LOCKFILE = File.expand_path('../../tmp/filer.lock', __FILE__)
+
+    # Are the sensors set to UTC instead of localtime?
+    UTC = false
+
 
 end
