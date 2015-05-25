@@ -96,7 +96,11 @@ module PacketsAtRest
                 unixtime = file.sub(/#{@fileprefix}\./, '').to_i
 
                 # should this be Time.at(unixtime).utc ??
-                return Time.at(unixtime)
+                if @utc
+                    return Time.at(unixtime).utc
+                else
+                    return Time.at(unixtime)
+                end    
 
             end
         end

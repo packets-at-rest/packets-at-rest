@@ -29,9 +29,9 @@ module PacketsAtRest
                     options[:fileprefix] = value
                   end
 
-                  #  opt.on("-u", "--utc", "Print UTC time (zulu/greenwich)", "  Default: #{options[:utc]}") do |value|
-                  #    options[:utc] = value
-                  #  end
+                  opt.on("-u", "--utc", "Print UTC time (zulu/greenwich)", "  Default: #{options[:utc]}") do |value|
+                      options[:utc] = value
+                  end
 
                   opt.separator " Other Options::"
                   opt.separator ""

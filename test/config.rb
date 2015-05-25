@@ -29,7 +29,7 @@ module PacketsAtRest
     LOCKFILE = File.expand_path('../../tmp/filer.lock', __FILE__)
 
     # Are the sensors set to UTC instead of localtime?
-    UTC = false
+    UTC = true
 
 
 end

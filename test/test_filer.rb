@@ -31,7 +31,7 @@ class FilerTest < MiniTest::Unit::TestCase
   end
 
   def test_file_pcaps
-    assert_equal ["test/data/filed/2015/05/22/14/"], @filer.file_pcaps
+    assert_equal ["test/data/filed/2015/05/22/18/"], @filer.file_pcaps
   end
 
 end
