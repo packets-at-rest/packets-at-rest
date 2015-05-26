@@ -1,6 +1,5 @@
 # test.rb
 require File.expand_path '../test_helper.rb', __FILE__
-require_relative '../lib/controllers/collector.rb'
 require_relative '../app/collector.rb'
 require_relative 'config.rb'
 
@@ -21,36 +20,29 @@ class CollectorTest < MiniTest::Unit::TestCase
     get "/data.pcap"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert('should return an error with a message') {
-      json.key? 'error'
-    }
+    assert(json.key?('error'), 'should return an error with a message')
   end
 
   def test_get_pcap_without_node_id
     get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{MASTERKEY}"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert('should return an error with a message') {
-      json.key? 'error'
-    }
+    assert(json.key?('error'), 'should return an error with a message')
+
   end
 
   def test_get_pcap_without_access_to_node
     get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{ONEKEY}&node_id=2"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert('should return an error with a message') {
-      json.key? 'error'
-    }
+    assert(json.key?('error'), 'should return an error with a message')
   end
 
   def test_get_pcap_for_unknown_node
     get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{MASTERKEY}&node_id=10"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert('should return an error with a message') {
-      json.key? 'error'
-    }
+    assert(json.key?('error'), 'should return an error with a message')
   end
 
   def test_get_pcap_url
@@ -62,18 +54,14 @@ class CollectorTest < MiniTest::Unit::TestCase
     get "/keys"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert('should return an error with a message') {
-      json.key? 'error'
-    }
+    assert(json.key?('error'), 'should return an error with a message')
   end
 
   def test_get_keys_with_master_api_key
     get "/keys?api_key=#{MASTERKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert('should return all keys') {
-      json.count == 4 and json.key? '27ee688c-c412-43f8-ad67-ee5287b59e80'
-    }
+    assert((json.count == 4 and json.key?('27ee688c-c412-43f8-ad67-ee5287b59e80')), 'should return all keys')
   end
 
   # /ping
@@ -81,18 +69,14 @@ class CollectorTest < MiniTest::Unit::TestCase
     get "/ping"
     json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert('should return an error with a message') {
-      json.key? 'error'
-    }
+    assert(json.key?('error'), 'should return an error with a message')
   end
 
   def test_get_ping_with_master_api_key
     get "/ping?api_key=#{MASTERKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert('should return uptime and date') {
-      json.key? 'uptime' and json.key? 'date' and json.key? 'version' and json.key? 'api_version'
-    }
+    assert((json.key?('uptime') and json.key?('date') and json.key?('version') and json.key?('api_version')), 'should return uptime and date')
   end
 
   # /nodes/list
@@ -100,30 +84,23 @@ class CollectorTest < MiniTest::Unit::TestCase
     get "/nodes/list?api_key=#{MASTERKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert('should return keys it has access to') {
-      json.count == 2 and json.key? '1' and json.key? '2'
-    }
+    assert((json.count == 2 and json.key?('1') and json.key?('2')), 'should return keys it has access to')
+
   end
 
   def test_get_node_list_with_limited_api_key
     get "/nodes/list?api_key=#{ONEKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert('should return key it has access to') {
-      json.count == 1 and json.key? '1'
-    }
-    assert('should not return key it does not have access to') {
-      json.count == 1 and !json.key? '2' and !json.key? '0'
-    }
+    assert((json.count == 1 and json.key?('1')), 'should return key it has access to')
+    assert((json.count == 1 and !json.key?('2') and !json.key?('0')), 'should not return key it does not have access to')
   end
 
   def test_get_node_list_with_another_limited_api_key
     get "/nodes/list?api_key=#{TWOKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert('should return keys it has access to') {
-      json.count == 2 and json.key? '1' and json.key? '2'
-    }
+    assert((json.count == 2 and json.key?('1') and json.key?('2')), 'should return keys it has access to')
   end
 
 end

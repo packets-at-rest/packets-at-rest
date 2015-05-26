@@ -87,7 +87,7 @@ FILEPREFIX = 'pcap' # daemonlogger -n option
 Schedule the `filer`. For example, in crontab:
 
 ```cron
-* * * * * /usr/local/bin/ruby /opt/packets-at-rest/bin/filer.rb
+* * * * * /usr/local/bin/ruby /opt/packets-at-rest/bin/filer
 ```
 
 The `filer` can be simulated using the -S flag.

@@ -7,6 +7,7 @@ require_relative 'support/awesomereporter'
 
 require 'rack/test'
 require "codeclimate-test-reporter"
+require 'pry'
 
 CodeClimate::TestReporter.start
 

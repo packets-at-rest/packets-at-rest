@@ -1,6 +1,11 @@
-require 'sinatra/base'
+# Stdlib
+require 'sys/uptime'
+
+# Gems
 require 'json'
+require 'sinatra/base'
 require 'sinatra-initializers'
+
 
 module PacketsAtRest
   class PingableServer < Sinatra::Base

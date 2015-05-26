@@ -1,14 +1,19 @@
+# Stdlib
+require 'uri'
+require 'forwardable'
+
+# Gems
 require 'chronic'
 require 'json'
-require 'sys/uptime'
 require 'rest_client'
-require 'uri'
+
+# Local Files
 require_relative '../lib/version'
 require_relative '../lib/pingable_server'
 require_relative '../lib/controllers/collector'
 require_relative '../config/config'
 require_relative '../ext/util'
-require 'forwardable'
+
 
 module PacketsAtRest
   include Forwardable

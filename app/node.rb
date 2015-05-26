@@ -1,12 +1,32 @@
+# Stdlib
+require 'forwardable'
+
+# Gems
 require 'chronic'
+require 'json'
+
+# Local Files
 require_relative '../lib/version'
 require_relative '../lib/pingable_server'
+require_relative '../lib/controllers/node'
 require_relative '../config/config'
 require_relative '../ext/util'
 
+
 module PacketsAtRest
+  include Forwardable
 
   class Node < PingableServer
+    extend Forwardable
+
+    helpers do
+        def_delegators :@node, :filelist
+    end
+
+    before do
+      @node = PacketsAtRest::Controllers::Node.new
+    end
+
 
     get '/data.pcap' do
       keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
@@ -39,7 +59,8 @@ module PacketsAtRest
       filter = "host #{params['src_addr']} and host #{params['dst_addr']} and port #{params['src_port']} and port #{params['dst_port']}"
       files = filelist(start_dt, end_dt)
       command = "#{PRINTF} \"#{files.join('\n')}\\n\" | #{TCPDUMP} -V - -w - \"#{filter}\""
-      puts command
+
+      puts command unless PacketsAtRest::ROLE == :unit_test
 
       if files.empty?
         return notfound 'no capture data for that timeframe'
@@ -49,62 +70,7 @@ module PacketsAtRest
       return [200, `#{command}`]
     end
 
-    def filelist start_dt, end_dt
-      # ensure boundary minutes are included by subtracting/adding a minute
-      adj_start_dt = start_dt - 60
-      adj_end_dt = end_dt + 60
 
-      start_d = adj_start_dt.to_date
-      end_d = adj_end_dt.to_date
-
-      dirs = []
-
-      if start_d == end_d
-        (adj_start_dt.hour .. adj_end_dt.hour).each do |hour|
-          dirs << "#{FILERDIR}/#{adj_start_dt.year}/#{adj_start_dt.month.pad2}/#{adj_start_dt.day.pad2}/#{hour.pad2}/"
-        end
-      else
-        (adj_start_dt.hour .. 23).each do |hour|
-          dirs << "#{FILERDIR}/#{adj_start_dt.year}/#{adj_start_dt.month.pad2}/#{adj_start_dt.day.pad2}/#{hour.pad2}/"
-        end
-        (start_d .. end_d).to_a[1...-1].each do |date|
-          (0 .. 23).each do |hour|
-            dirs << "#{FILERDIR}/#{date.year}/#{date.month.pad2}/#{date.day.pad2}/#{hour.pad2}/"
-          end
-        end
-        (0 .. adj_end_dt.hour).each do |hour|
-          dirs << "#{FILERDIR}/#{adj_end_dt.year}/#{adj_end_dt.month.pad2}/#{adj_end_dt.day.pad2}/#{hour.pad2}/"
-        end
-      end
-
-      files = []
-
-      if dirs.first == dirs.last
-        Dir["#{dirs.first}/*"].sort.each do |path|
-          file = File.basename(path)
-          unixtime = file.sub(/#{FILEPREFIX}\./, '').to_i
-          files << path if unixtime >= adj_start_dt.to_i and unixtime <= adj_end_dt.to_i
-        end
-      else
-        Dir["#{dirs.first}/*"].sort.each do |path|
-          file = File.basename(path)
-          unixtime = file.sub(/#{FILEPREFIX}\./, '').to_i
-          files << path if unixtime >= adj_start_dt.to_i and unixtime <= adj_end_dt.to_i
-        end
-        dirs.to_a[1...-1].each do |dir|
-          Dir["#{dir}/*"].sort.each do |path|
-            files << path
-          end
-        end
-        Dir["#{dirs.last}/*"].sort.each do |path|
-          file = File.basename(path)
-          unixtime = file.sub(/#{FILEPREFIX}\./, '').to_i
-          files << path if unixtime >= adj_start_dt.to_i and unixtime <= adj_end_dt.to_i
-        end
-      end
-
-      files
-    end
 
   end
 

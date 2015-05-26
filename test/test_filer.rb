@@ -3,6 +3,7 @@ require File.expand_path '../test_helper.rb', __FILE__
 require 'fileutils'
 require 'logger'
 
+require_relative '../ext/util'
 require_relative '../lib/filer/filer.rb'
 require_relative 'config.rb'
 
