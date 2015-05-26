@@ -16,7 +16,7 @@ class FilerTest < MiniTest::Unit::TestCase
   # return filename of last moved file
 
   def setup
-    @filer = PacketsAtRest::Filer::Filer.new({:simulate => true})
+    @filer = PacketsAtRest::Filer::Filer.new({:simulate => true, :logger_io => '/dev/null'})
   end
 
   def test_filer_defaults

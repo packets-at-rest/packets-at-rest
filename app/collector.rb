@@ -5,16 +5,27 @@ require 'rest_client'
 require 'uri'
 require_relative '../lib/version'
 require_relative '../lib/pingable_server'
+require_relative '../lib/controllers/collector'
 require_relative '../config/config'
 require_relative '../ext/util'
+require 'forwardable'
 
 module PacketsAtRest
+  include Forwardable
 
   class Collector < PingableServer
 
+    extend Forwardable
+
+    helpers do
+      def_delegators :@collector, :lookup_nodes_by_api_key, :lookup_nodeaddress_by_id, :lookup_nodeaddresses
+    end
+
     before do
       begin
+        @collector = PacketsAtRest::Controllers::Collector.new
         nodes = lookup_nodes_by_api_key(params['api_key'])
+
         if not nodes
           halt unauthorized 'unknown api_key'
         end
@@ -33,11 +44,12 @@ module PacketsAtRest
         end
 
         nodes = lookup_nodes_by_api_key(params['api_key'])
+
         if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
           return forbidden 'api_key not allowed to request this resource'
         end
 
-        node_address = lookup_nodeaddress_by_id params['node_id']
+        node_address = lookup_nodeaddress_by_id(params['node_id'])
         if not node_address
           return badrequest 'unknown node'
         end
@@ -61,6 +73,7 @@ module PacketsAtRest
       content_type :json
       begin
         nodes = lookup_nodes_by_api_key(params['api_key'])
+
         if nodes.include? "0"
           return JSON.parse(File.read(APIFILE)).to_json
         else
@@ -75,6 +88,7 @@ module PacketsAtRest
       content_type :json
       begin
         nodes = lookup_nodes_by_api_key(params['api_key'])
+
         if nodes.include? "0"
           return JSON.parse(File.read(NODEFILE)).to_json
         else
@@ -90,11 +104,12 @@ module PacketsAtRest
         content_type :json
 
         nodes = lookup_nodes_by_api_key(params['api_key'])
+
         if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
           return forbidden 'api_key not allowed to request this resource'
         end
 
-        node_address = lookup_nodeaddress_by_id params['node_id']
+        node_address = lookup_nodeaddress_by_id(params['node_id'])
         if not node_address
           return badrequest 'unknown node'
         end
@@ -108,31 +123,8 @@ module PacketsAtRest
       end
     end
 
-    def lookup_nodes_by_api_key api_key
-      begin
-        h = JSON.parse(File.read(APIFILE))
-        return h[api_key]
-      rescue
-        nil
-      end
-    end
 
-    def lookup_nodeaddress_by_id id
-      begin
-        h = JSON.parse(File.read(NODEFILE))
-        return h[id]
-      rescue
-        nil
-      end
-    end
 
-    def lookup_nodeaddresses
-      begin
-        return JSON.parse(File.read(NODEFILE))
-      rescue
-        nil
-      end
-    end
 
   end
 

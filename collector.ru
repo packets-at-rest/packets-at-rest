@@ -7,5 +7,5 @@ module PacketsAtRest
   ROLE = :collector
 end
 
-require './collector/collector'
+require './app/collector'
 run PacketsAtRest::Collector

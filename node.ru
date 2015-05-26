@@ -7,5 +7,5 @@ module PacketsAtRest
   ROLE = :node
 end
 
-require './node/node'
+require './app/node'
 run PacketsAtRest::Node
