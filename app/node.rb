@@ -58,7 +58,7 @@ module PacketsAtRest
 
       filter = "host #{params['src_addr']} and host #{params['dst_addr']} and port #{params['src_port']} and port #{params['dst_port']}"
       files = filelist(start_dt, end_dt)
-      command = "#{PRINTF} \"#{files.join('\n')}\\n\" | #{TCPDUMP} -V - -w - \"#{filter}\""
+      command = "#{PRINTF} \"#{files.join('\n')}\\n\" | #{TCPDUMP} -V - -w - \"#{filter}\" 2> /dev/null"
 
       puts command unless PacketsAtRest::ROLE == :unit_test
 

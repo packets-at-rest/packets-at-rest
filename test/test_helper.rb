@@ -17,5 +17,5 @@ end
 
 
 
-reporter_options = { color: true, slow_count: 5, slow_threshold: 0.01  }
+reporter_options = { color: true, slow_count: 5, slow_threshold: 0.02  }
 Minitest::Reporters.use! [Minitest::Reporters::AwesomeReporter.new(reporter_options)]
