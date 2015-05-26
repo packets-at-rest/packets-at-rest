@@ -2,8 +2,8 @@ module PacketsAtRest
     module Controllers
         class Node
             def initialize(opts = {})
-                @filerdir = opts[:apifile] || PacketsAtRest::FILERDIR
-                @fileprefix = opts[:nodefile] || PacketsAtRest::FILEPREFIX
+                @filerdir = opts[:filerdir] || PacketsAtRest::FILERDIR
+                @fileprefix = opts[:fileprefix] || PacketsAtRest::FILEPREFIX
             end
 
             def filelist(start_dt, end_dt)
