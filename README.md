@@ -12,27 +12,36 @@ Packets at Rest is a RESTful web interface to pcap data on distributed network s
 [![Test Coverage](https://codeclimate.com/github/packets-at-rest/packets-at-rest/badges/coverage.svg)](https://codeclimate.com/github/packets-at-rest/packets-at-rest)
 [![Dependency Status](https://gemnasium.com/packets-at-rest/packets-at-rest.svg)](https://gemnasium.com/packets-at-rest/packets-at-rest)
 
-## Environment and Dependencies
-Suggested operating system is FreeBSD.
+## Environment, Dependencies, and Deployment Considerations
+The Suggested operating system is FreeBSD for `node` for high efficiency capture. 
 
-System dependencies include:
-* net/daemonlogger
+The Suggested operating system for `collector` is any modern *nix operating system. 
 
-Although the Collector and the Node can exist on the same server we recommend a HA of Collectors with x-N Nodes. Collectors in a HA configuration are not aware of each other, and should be targeted via Round Robin DNS queries.
+General System dependencies include:
+* Ruby
+* Bundler
+* Rack based webserver
 
-* https://www.digitalocean.com/community/tutorials/how-to-configure-dns-round-robin-load-balancing-for-high-availability
+`node` System dependencies include:
+* daemonlogger
+* tcpdump
+* printf
 
-## Dependency Information
+### Dependency Information
 
-The Ruby based API is powered by sinatra and rack.
+The Ruby based Web API is powered by sinatra and rack.
 
 * http://www.sinatrarb.com/
 * http://rack.github.io/
 
-Packets-at-REST recommends a quality well test web server like nginx with phusion passenger.
+Packets-at-REST recommends a quality well test SSL web server like nginx with phusion passenger.
 * https://www.phusionpassenger.com/
 * http://wiki.nginx.org/Main
-* (NGINX+Phusion Passenger)(https://www.phusionpassenger.com/documentation/Users%20guide%20Nginx.html)
+* [NGINX+Phusion Passenger](https://www.phusionpassenger.com/documentation/Users%20guide%20Nginx.html)
+
+Although the Collector and the Node can exist on the same server we recommend a HA of Collectors with x-N Nodes. Collectors in a HA configuration are not aware of each other, and should be targeted via Round Robin DNS queries.
+
+* [Round Robin DNS Load Balancing](https://www.digitalocean.com/community/tutorials/how-to-configure-dns-round-robin-load-balancing-for-high-availability)
 
 
 ## Installation
@@ -83,7 +92,7 @@ FILERDIR = '/data/filed'
 FILEPREFIX = 'pcap' # daemonlogger -n option
 ````
 
-Setup your (ALPACA)[https://github.com/jeffchao/alpaca] ** RACK FIREWALL ** configuration for your node.
+Setup your [ALPACA](https://github.com/jeffchao/alpaca) **RACK-Based ACLs** configuration for your node.
 
 It is recommended to only accept connections from the Collectors IP/Host addresses.
 
@@ -94,6 +103,8 @@ whitelist:
   - 127.0.0.1
   - "::/128"
   - 10.0.0.0/8
+blacklist:
+  - 8.8.8.8
 default: deny
 ```
 
