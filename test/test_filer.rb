@@ -7,14 +7,7 @@ require_relative '../ext/util'
 require_relative '../lib/filer/filer.rb'
 require_relative 'config.rb'
 
-
 class FilerTest < MiniTest::Unit::TestCase
-
-  # act on all files except the last (the one that daemonlogger is currently writing to)
-
-  # return list of filenames to process
-
-  # return filename of last moved file
 
   def setup
     @filer = PacketsAtRest::Filer::Filer.new({:simulate => true, :logger_io => '/dev/null'})

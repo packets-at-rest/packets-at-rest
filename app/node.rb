@@ -17,7 +17,9 @@ module PacketsAtRest
   include Forwardable
 
   class Node < PingableServer
+
     extend Forwardable
+    helpers Sinatra::Param
 
     helpers do
         def_delegators :@node, :filelist
@@ -29,36 +31,29 @@ module PacketsAtRest
 
 
     get '/data.pcap' do
-      keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
-      if not keys.reduce(true){ |memo, param| memo && params.key?(param) }
-        return badrequest 'must provide all six parameters: src_addr, src_port, dst_addr, dst_port, start_time, end_time'
-      end
+      param :src_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
+      param :src_port,           Integer, min: 1, max: 65536, required: true
+      param :dst_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
+      param :dst_port,           Integer, min: 1, max: 65536, required: true
+      param :start_time,         String, required: true
+      param :end_time,           String, required: true
 
-      # input validation
-      valid_msg = ''
-      src_port = nil
-      begin
-        src_port = Integer(params['src_port'], 10)
-      rescue
-      end
-      valid_msg += 'invalid source port. ' if src_port == nil or src_port < 0 or src_port > 65535
-      dst_port = nil
-      begin
-        dst_port = Integer(params['dst_port'], 10)
-      rescue
-      end
-      valid_msg += 'invalid destination port. ' if dst_port == nil or dst_port < 0 or dst_port > 65535
+      invalid_msg = ''
       start_dt = Chronic.parse(params['start_time'])
-      valid_msg += 'invalid start time. ' if start_dt == nil
+      invalid_msg += 'invalid start time. ' if start_dt == nil
+
       end_dt = Chronic.parse(params['end_time'])
-      valid_msg += 'invalid end time. ' if end_dt == nil
-      if not valid_msg.empty?
-        return badrequest valid_msg.chop
+      invalid_msg += 'invalid end time. ' if end_dt == nil
+
+      if not invalid_msg.empty?
+        return badrequest invalid_msg.chop
       end
 
-      filter = "host #{params['src_addr']} and host #{params['dst_addr']} and port #{params['src_port']} and port #{params['dst_port']}"
+      bpf_filter = "host #{params['src_addr']} and host #{params['dst_addr']} and port #{params['src_port']} and port #{params['dst_port']}"
       files = filelist(start_dt, end_dt)
-      command = "#{PRINTF} \"#{files.join('\n')}\\n\" | #{TCPDUMP} -V - -w - \"#{filter}\" 2> /dev/null"
+
+
+      command = "#{PRINTF} \"#{files.join('\n')}\\n\" | #{TCPDUMP} -V - -w - \"#{bpf_filter}\" 2> /dev/null"
 
       puts command unless PacketsAtRest::ROLE == :unit_test
 
@@ -69,8 +64,6 @@ module PacketsAtRest
       content_type 'application/pcap'
       return [200, `#{command}`]
     end
-
-
 
   end
 

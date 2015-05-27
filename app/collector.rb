@@ -21,6 +21,7 @@ module PacketsAtRest
   class Collector < PingableServer
 
     extend Forwardable
+    helpers Sinatra::Param
 
     helpers do
       def_delegators :@collector, :lookup_nodes_by_api_key, :lookup_nodeaddress_by_id, :lookup_nodeaddresses
@@ -41,6 +42,17 @@ module PacketsAtRest
 
     get '/data.pcap' do
       begin
+
+        param :src_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
+        param :src_port,           Integer, min: 1, max: 65536, required: true
+        param :dst_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
+        param :dst_port,           Integer, min: 1, max: 65536, required: true
+        param :start_time,         String, required: true
+        param :end_time,           String, required: true
+        param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+        param :node_id,             Integer, required: true
+
+
         packet_keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
         other_keys = ['api_key', 'node_id']
         missing_keys = (packet_keys + other_keys).select { |k| !params.key? k }
@@ -75,7 +87,11 @@ module PacketsAtRest
     end
 
     get '/keys' do
+
+      param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+
       content_type :json
+
       begin
         nodes = lookup_nodes_by_api_key(params['api_key'])
 
@@ -90,7 +106,11 @@ module PacketsAtRest
     end
 
     get '/nodes/list' do
+
+      param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+
       content_type :json
+
       begin
         nodes = lookup_nodes_by_api_key(params['api_key'])
 
@@ -105,6 +125,10 @@ module PacketsAtRest
     end
 
     get '/nodes/:node_id/ping' do
+
+      param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+      param :node_id,             Integer, required: true
+
       begin
         content_type :json
 

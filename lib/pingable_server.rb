@@ -4,6 +4,7 @@ require 'sys/uptime'
 # Gems
 require 'json'
 require 'sinatra/base'
+require 'sinatra/param'
 require 'sinatra-initializers'
 
 

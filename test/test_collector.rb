@@ -25,10 +25,8 @@ class CollectorTest < MiniTest::Unit::TestCase
 
   def test_get_pcap_without_node_id
     get URI.encode "/data.pcap?src_addr=1.1.1.1&src_port=1&dst_addr=2.2.2.2&dst_port=2&start_time=2015-02-26 4pm&end_time=2015-02-26 4:05pm&api_key=#{MASTERKEY}"
-    json = JSON.parse(last_response.body)
     assert(!last_response.ok?, 'should not be ok')
-    assert(json.key?('error'), 'should return an error with a message')
-
+    assert((last_response.body == "Parameter is required"), "must provide valid parameters")
   end
 
   def test_get_pcap_without_access_to_node

@@ -1,5 +1,8 @@
 module PacketsAtRest
+    class InvalidHost < StandardError; end
+
     module Controllers
+
         class Node
             def initialize(opts = {})
                 @filerdir = opts[:filerdir] || PacketsAtRest::FILERDIR
@@ -17,13 +20,10 @@ module PacketsAtRest
               files = []
 
               if dirs.first == dirs.last
-                  #binding.pry
                 Dir["#{dirs.first}/*"].sort.each do |filepath|
-                    #binding.pry
                   files << filepath if _within_time_window?(filepath)
                 end
               else
-                  #binding.pry
                 Dir["#{dirs.first}/*"].sort.each do |filepath|
 
                   files << filepath if _within_time_window?(filepath)
@@ -37,8 +37,8 @@ module PacketsAtRest
                   files << filepath if _within_time_window?(filepath)
                 end
               end
-              #binding.pry
-              files
+
+              return files
             end
 
             private
@@ -87,6 +87,7 @@ module PacketsAtRest
                 adj_dt = dt + 60
                 return adj_dt.to_date, adj_dt
             end
+
 
         end
     end
