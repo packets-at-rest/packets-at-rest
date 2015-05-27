@@ -74,7 +74,7 @@ class CollectorTest < MiniTest::Unit::TestCase
     get "/ping?api_key=#{MASTERKEY}"
     json = JSON.parse(last_response.body)
     assert(last_response.ok?, 'should be ok')
-    assert((json.key?('uptime') and json.key?('date') and json.key?('version') and json.key?('api_version')), 'should return uptime and date')
+    assert((json.key?('uptime') and json.key?('date') and json.key?('version') and json.key?('api_version') and json.key?('role')), 'should return uptime and date')
   end
 
   # Replacing the missing node with a MOCK should make this pass.

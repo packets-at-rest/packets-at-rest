@@ -24,7 +24,8 @@ module PacketsAtRest
           "version" => PacketsAtRest::VERSION,
           "api_version" => PacketsAtRest::API_VERSION,
           "uptime" => Sys::Uptime.uptime,
-          "date" => Time.now.utc
+          "date" => Time.now.utc,
+          "role" => PacketsAtRest::ROLE.to_s
         }.to_json
       rescue
         return internalerror 'there was a problem getting heartbeat'
