@@ -12,7 +12,7 @@ module PacketsAtRest
             def lookup_nodes_by_api_key(api_key)
               begin
                 h = JSON.parse(File.read(@apifile))
-                return h[api_key]
+                return h[api_key.to_s]
               rescue
                 nil
               end
@@ -21,7 +21,7 @@ module PacketsAtRest
             def lookup_nodeaddress_by_id(id)
               begin
                 h = JSON.parse(File.read(@nodefile))
-                return h[id]
+                return h[id.to_s]
               rescue
                 nil
               end
