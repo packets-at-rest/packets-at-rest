@@ -7,12 +7,13 @@ gem 'sys-uptime', '~> 0.6.2'
 gem 'rest-client', '~> 1.8.0'
 gem 'sinatra-initializers', '~> 0.1.4'
 gem "sinatra-param", require: "sinatra/param"
+gem 'alpaca'
 
-group :thin do 
+group :thin do
   gem 'thin'
 end
 
-group :debug do 
+group :debug do
   gem 'pry'
 end
 

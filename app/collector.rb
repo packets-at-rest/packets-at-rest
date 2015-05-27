@@ -148,6 +148,34 @@ module PacketsAtRest
       end
     end
 
+    get '/nodes/:node_id/status' do
+
+      param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+      param :node_id,             Integer, required: true
+
+      content_type :json
+
+      begin
+        nodes = lookup_nodes_by_api_key(params['api_key'])
+
+        if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
+          return forbidden 'api_key not allowed to request this resource'
+        end
+
+        node_address = lookup_nodeaddress_by_id(params['node_id'])
+        if not node_address
+          return badrequest 'unknown node'
+        end
+
+        uri = URI.encode("http://#{node_address}/status")
+        RestClient.get(uri) do |response, request, result|
+          [response.code, response.body]
+        end
+      rescue
+        return internalerror 'there was a problem requesting from the node'
+      end
+    end
+
   end
 
 end

@@ -12,6 +12,7 @@ coverage
 
 config.ru
 config/*.conf
+config/*.yml
 
 doc/
 lib/bundler/man

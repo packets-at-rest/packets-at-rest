@@ -65,6 +65,25 @@ module PacketsAtRest
       return [200, `#{command}`]
     end
 
+    get '/status' do
+      content_type :json
+      begin
+        return {
+          "hostname" => `hostname -f`.strip,
+          "capturedir" => PacketsAtRest::CAPTUREDIR,
+          "capturedir_df" => `df -h #{PacketsAtRest::CAPTUREDIR} |tail -1`.strip,
+          "capturedir_du" => `du -hd 0 #{PacketsAtRest::CAPTUREDIR}`.strip,
+          "filerdir" => PacketsAtRest::FILERDIR,
+          "filerdir_df" => `df -h #{PacketsAtRest::FILERDIR} |tail -1`.strip,
+          "filerdir_du" => `du -hd 0 #{PacketsAtRest::FILERDIR}`.strip,
+          "system_date" => `date`.strip
+          "utc_date" => Time.now.utc
+        }.to_json
+      rescue
+        return internalerror 'there was a problem getting status'
+      end
+    end
+
   end
 
 end

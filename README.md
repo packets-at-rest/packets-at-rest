@@ -82,6 +82,20 @@ FILERDIR = '/data/filed'
 FILEPREFIX = 'pcap' # daemonlogger -n option
 ````
 
+Setup your (ALPACA)[https://github.com/jeffchao/alpaca] ** RACK FIREWALL ** configuration for your node.
+
+It is recommended to only accept connections from the Collectors IP/Host addresses.
+
+The configuration file should be located in config/alpaca.yml
+
+```yml
+whitelist:
+  - 127.0.0.1
+  - "::/128"
+  - 10.0.0.0/8
+default: deny
+```
+
 ### Setup Filer on each Node
 
 Schedule the `filer`. For example, in crontab:
