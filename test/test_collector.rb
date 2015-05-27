@@ -77,6 +77,15 @@ class CollectorTest < MiniTest::Unit::TestCase
     assert((json.key?('uptime') and json.key?('date') and json.key?('version') and json.key?('api_version')), 'should return uptime and date')
   end
 
+  # Replacing the missing node with a MOCK should make this pass.
+  def test_get_remote_ping_with_master_api_key
+    get "/nodes/1/ping?api_key=#{MASTERKEY}"
+    json = JSON.parse(last_response.body)
+    assert(!last_response.ok?, 'should not be ok')
+    assert((json.key?('error') and json["error"] == "there was a problem requesting from the node"), 'should return an error with a message')
+  end
+
+
   # /nodes/list
   def test_get_node_list_with_master_api_key
     get "/nodes/list?api_key=#{MASTERKEY}"
