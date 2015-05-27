@@ -1,5 +1,9 @@
+# Both the whitelist and the blacklist section is required
+# Documentation:  ** https://github.com/jeffchao/alpaca **
 whitelist:
   - 127.0.0.1
   - "::/128"
   - 18.18.0.0/15
+blacklist:
+  - 8.8.8.8  
 default: deny
