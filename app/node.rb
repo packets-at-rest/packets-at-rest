@@ -71,13 +71,20 @@ module PacketsAtRest
         return {
           "hostname" => `hostname -f`.strip,
           "capturedir" => PacketsAtRest::CAPTUREDIR,
-          "capturedir_df" => `df -h #{PacketsAtRest::CAPTUREDIR} |tail -1`.strip,
-          "capturedir_du" => `du -hd 0 #{PacketsAtRest::CAPTUREDIR}`.strip,
           "filerdir" => PacketsAtRest::FILERDIR,
-          "filerdir_df" => `df -h #{PacketsAtRest::FILERDIR} |tail -1`.strip,
-          "filerdir_du" => `du -hd 0 #{PacketsAtRest::FILERDIR}`.strip,
+          "du" => {
+              "filerdir" => `du -hd 0 #{PacketsAtRest::FILERDIR}`.strip,
+              "capturedir" => `du -hd 0 #{PacketsAtRest::CAPTUREDIR}`.strip
+          },
+          "df" => {
+              "filerdir" => `df -h #{PacketsAtRest::FILERDIR} |tail -1`.strip,
+              "capturedir" => `df -h #{PacketsAtRest::CAPTUREDIR} |tail -1`.strip
+          },
+          "netstat" => {
+              "daemonlogger" => `netstat -B |grep daemon`.strip
+          },
           "system_date" => `date`.strip,
-          "utc_date" => Time.now.utc
+          "ruby_utc_datetime" => Time.now.utc
         }.to_json
       rescue
         return internalerror 'there was a problem getting status'
