@@ -55,10 +55,6 @@ module PacketsAtRest
 
         packet_keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
         other_keys = ['api_key', 'node_id']
-        missing_keys = (packet_keys + other_keys).select { |k| !params.key? k }
-        if not missing_keys.empty?
-          return badrequest "must provide missing parameters: #{missing_keys.join(', ')}"
-        end
 
         nodes = lookup_nodes_by_api_key(params['api_key'])
 
@@ -96,7 +92,7 @@ module PacketsAtRest
         nodes = lookup_nodes_by_api_key(params['api_key'])
 
         if nodes.include? "0"
-          return JSON.parse(File.read(APIFILE)).to_json
+          return JSON.parse(File.read(@collector.apifile)).to_json
         else
           return forbidden 'api_key not allowed to request this resource'
         end
@@ -115,7 +111,7 @@ module PacketsAtRest
         nodes = lookup_nodes_by_api_key(params['api_key'])
 
         if nodes.include? "0"
-          return JSON.parse(File.read(NODEFILE)).to_json
+          return JSON.parse(File.read(@collector.nodefile)).to_json
         else
           return lookup_nodeaddresses.keep_if { |k, v| nodes.include? k }.to_json
         end
@@ -129,9 +125,9 @@ module PacketsAtRest
       param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
       param :node_id,             Integer, required: true
 
-      begin
-        content_type :json
+      content_type :json
 
+      begin
         nodes = lookup_nodes_by_api_key(params['api_key'])
 
         if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
@@ -151,9 +147,6 @@ module PacketsAtRest
         return internalerror 'there was a problem requesting from the node'
       end
     end
-
-
-
 
   end
 

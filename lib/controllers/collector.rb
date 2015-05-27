@@ -1,6 +1,9 @@
 module PacketsAtRest
     module Controllers
         class Collector
+
+            attr_reader :apifile, :nodefile
+
             def initialize(opts = {})
                 @apifile = opts[:apifile] || PacketsAtRest::APIFILE
                 @nodefile = opts[:nodefile] || PacketsAtRest::NODEFILE

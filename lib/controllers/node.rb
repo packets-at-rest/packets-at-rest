@@ -4,6 +4,8 @@ module PacketsAtRest
     module Controllers
 
         class Node
+            attr_reader :filedir, :fileprefix
+            
             def initialize(opts = {})
                 @filerdir = opts[:filerdir] || PacketsAtRest::FILERDIR
                 @fileprefix = opts[:fileprefix] || PacketsAtRest::FILEPREFIX
