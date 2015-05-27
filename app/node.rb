@@ -76,7 +76,7 @@ module PacketsAtRest
           "filerdir" => PacketsAtRest::FILERDIR,
           "filerdir_df" => `df -h #{PacketsAtRest::FILERDIR} |tail -1`.strip,
           "filerdir_du" => `du -hd 0 #{PacketsAtRest::FILERDIR}`.strip,
-          "system_date" => `date`.strip
+          "system_date" => `date`.strip,
           "utc_date" => Time.now.utc
         }.to_json
       rescue
