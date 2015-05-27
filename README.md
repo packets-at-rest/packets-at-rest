@@ -1,7 +1,7 @@
 # packets-at-rest
 
 [![GitHub release](https://img.shields.io/github/tag/packets-at-rest/packets-at-rest.svg)](https://github.com/packets-at-rest/packets-at-rest)
-[![API version](https://img.shields.io/badge/api-0.1.2-aa00aa.svg)](https://github.com/packets-at-rest/packets-at-rest/blob/master/lib/version.rb)
+[![API version](https://img.shields.io/badge/api-0.1.3-aa00aa.svg)](https://github.com/packets-at-rest/packets-at-rest/blob/master/lib/version.rb)
 
 Packets at Rest is a RESTful web interface to pcap data on distributed network sensors through the use of IPFIX flow tuples and simple API rolebased access controls.
 
@@ -183,6 +183,137 @@ Make a request. For example:
 ```
 http://127.0.0.1:9001/data.pcap?src_addr=1.1.1.1&src_port=111&dst_addr=2.2.2.2&dst_port=222&start_time=2001-01-01 5:01pm&end_time=2001-01-01 5:05pm&api_key=54b22f56-9a84-4893-bc70-332e3b5ded66&node_id=1
 ```
+
+## The API
+
+Getting Information from the `collector`.
+
+### Ping
+
+`https://10.0.0.2/ping?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`
+
+```json
+{
+  version: "0.6.2",
+  api_version: "0.1.2",
+  uptime: "0:4:5:13",
+  date: "2015-05-27 18:31:22 UTC",
+  role: "collector"
+}
+```
+
+`https://10.0.0.2/nodes/1/ping?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`
+
+```json
+{
+  version: "0.6.2",
+  api_version: "0.1.2",
+  uptime: "106:3:30:46",
+  date: "2015-05-27 18:27:24 UTC",
+  role: "node"
+}
+```
+
+### Status
+
+`https://10.0.0.2/nodes/1/status?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`
+
+```json
+{
+  hostname: "sensor-1.nowhere.org",
+  capturedir: "/data/pcap",
+  filerdir: "/data/filed",
+  du: {
+    filerdir: "4.0k	/data/filed",
+    capturedir: "4.0k	/data/pcap"
+  },
+  df: {
+    filerdir: "/dev/mfid0p3 7.7G 4.1G 3G 58% /",
+    capturedir: "/dev/mfid0p3 7.7G 4.1G 3G 58% /"
+  },
+  netstat: {
+    daemonlogger: "626 bce1 p--s--- 16297985219 47 595580784 0 0 daemonlogger"
+  },
+  system_date: "Wed May 27 18:22:12 UTC 2015",
+  ruby_utc_datetime: "2015-05-27 18:22:12 UTC"
+}
+```
+
+### Node listing
+
+`https://10.0.0.2/nodes/list?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`
+
+```json
+{
+  1: "120.18.0.151",
+  2: "120.18.0.152:9000",
+  3: "120.18.0.153",
+  4: "120.18.0.154:9000"
+}
+```
+### Keys
+
+Query access controls
+
+`https://10.0.0.2/keys?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`
+
+```json
+{
+  54b22f56-9a84-4893-bc70-332e3b5ded66: [
+    "0"
+  ],
+  d5c3d52e-d42c-41ff-bbfa-d3e802770ee1: [
+    "1",
+    "2",
+    "3"
+  ],
+  ce34b5ac-df85-40f0-9500-2a4a7781a6c4: [
+    "1",
+    "3",
+    "4"
+  ]
+}
+```
+
+### PCAP Data
+
+```shell
+https://10.0.0.2/data.pcap?src_addr=1.1.1.1&src_port=111&dst_addr=2.2.2.2&dst_port=222&start_time=2001-01-01 5:01pm&end_time=2001-01-01 5:05pm&api_key=54b22f56-9a84-4893-bc70-332e3b5ded66&node_id=1
+```
+
+Requests should be well formed:
+
+```ruby 
+  param :src_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
+  param :src_port,           Integer, min: 1, max: 65536, required: true
+  param :dst_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
+  param :dst_port,           Integer, min: 1, max: 65536, required: true
+  param :start_time,         String, required: true
+  param :end_time,           String, required: true
+  param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+  param :node_id,             Integer, required: true
+```
+
+Response headers include:
+
+`:content_type => application/pcap`
+
+PCAP files applications such as [Wireshark](https://www.wireshark.org/) can be associated to automagically open on download of pcapfile.
+
+### PCAP vs PCAPNG
+
+Standard pcap files with "pcapfile magic number = `\xd4\xc3\xb2\xa1`" have been around for many years. Newer [pcapng](https://wiki.wireshark.org/Development/PcapNg) files can be read by *wireshark*, *tcpdump*, etc.. but are not always available. 
+
+Proper MIME type for standard PCAP
+`application/vnd.tcpdump.pcap; charset=binary`
+
+### Magic Number Matching
+
+Standard PCAP 
+`tcpdump capture file (little-endian) [application/vnd.tcpdump.pcap]`
+
+NextGeneration PCAPs (.pcapng)
+`extended tcpdump capture file (little-endian) []`
 
 ### Data Flow
 
