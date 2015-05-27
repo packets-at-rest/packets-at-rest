@@ -8,6 +8,14 @@ gem 'rest-client', '~> 1.8.0'
 gem 'sinatra-initializers', '~> 0.1.4'
 gem "sinatra-param", require: "sinatra/param"
 
+group :thin do 
+  gem 'thin'
+end
+
+group :debug do 
+  gem 'pry'
+end
+
 group :coverage do
   gem 'simplecov', :require => false
 end
