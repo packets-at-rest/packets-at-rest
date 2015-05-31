@@ -339,8 +339,8 @@ Collector
 
 Access Controls:
 
-~~ https://10.0.0.2/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66 ~~
-~~ https://10.0.0.2/nodes/1/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66~~
+~~https://10.0.0.2/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66~~
+~~https://10.0.0.2/nodes/1/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66~~
 
 Node
 
