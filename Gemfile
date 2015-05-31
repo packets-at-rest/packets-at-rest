@@ -28,3 +28,8 @@ group :test do
     gem "codeclimate-test-reporter", require: nil
     gem "minitest-reporters", require: nil
 end
+
+# Install gems from each plugin
+Dir.glob(File.join(File.dirname(__FILE__), 'plugins', '**', "Gemfile")) do |gemfile|
+    eval(IO.read(gemfile), binding)
+end

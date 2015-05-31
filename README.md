@@ -283,7 +283,7 @@ https://10.0.0.2/data.pcap?src_addr=1.1.1.1&src_port=111&dst_addr=2.2.2.2&dst_po
 
 Requests should be well formed:
 
-```ruby 
+```ruby
   param :src_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
   param :src_port,           Integer, min: 1, max: 65536, required: true
   param :dst_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
@@ -302,14 +302,14 @@ PCAP files applications such as [Wireshark](https://www.wireshark.org/) can be a
 
 ### PCAP vs PCAPNG
 
-Standard pcap files with "pcapfile magic number = `\xd4\xc3\xb2\xa1`" have been around for many years. Newer [pcapng](https://wiki.wireshark.org/Development/PcapNg) files can be read by *wireshark*, *tcpdump*, etc.. but are not always available. 
+Standard pcap files with "pcapfile magic number = `\xd4\xc3\xb2\xa1`" have been around for many years. Newer [pcapng](https://wiki.wireshark.org/Development/PcapNg) files can be read by *wireshark*, *tcpdump*, etc.. but are not always available.
 
 Proper MIME type for standard PCAP
 `application/vnd.tcpdump.pcap; charset=binary`
 
 ### Magic Number Matching
 
-Standard PCAP 
+Standard PCAP
 `tcpdump capture file (little-endian) [application/vnd.tcpdump.pcap]`
 
 NextGeneration PCAPs (.pcapng)
@@ -318,3 +318,46 @@ NextGeneration PCAPs (.pcapng)
 ### Data Flow
 
 ![diagram](https://raw.github.com/packets-at-rest/packets-at-rest/cdn-images/diagram.png)
+
+
+## Plug-ins
+
+Packets at REST supports plug-ins. Plugins should be installed into the `/plugins` dir.
+
+Each plugin must register with the main application.
+
+* See (packets-at-rest/par_plugin_facter)[https://github.com/packets-at-rest/par_plugin_facter] for an example.
+* See plugins/README.md for more information.
+
+The plugin class must be `Plugin`
+
+## API
+
+Collector
+
+`https://10.0.0.2/plugins`
+
+Todo:
+
+~~ `https://10.0.0.2/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`~~
+~~ `https://10.0.0.2/nodes/1/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`~~
+
+Node
+
+`https://10.0.0.90/plugins`
+
+```json
+[
+    {
+        id: "par_plugin_facter",
+        name: "Facter plugin for Packets At REST",
+        description: "returns json output of the facter gem for system information",
+        url: "http://github.com/packets-at-rest/par_plugin_facter",
+        author: "shadowbq",
+        author_url: "mailto:shadowbq@gmail.com",
+        version: "0.1.2",
+        settings: null,
+        directory: null
+    }
+]
+```

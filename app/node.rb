@@ -6,12 +6,8 @@ require 'chronic'
 require 'json'
 
 # Local Files
-require_relative '../lib/version'
 require_relative '../lib/pingable_server'
 require_relative '../lib/controllers/node'
-require_relative '../config/config'
-require_relative '../ext/util'
-
 
 module PacketsAtRest
   include Forwardable

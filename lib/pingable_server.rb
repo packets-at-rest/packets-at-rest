@@ -3,10 +3,15 @@ require 'sys/uptime'
 
 # Gems
 require 'json'
+
 require 'sinatra/base'
 require 'sinatra/param'
 require 'sinatra-initializers'
 
+# Require Local
+require_relative '../lib/version'
+require_relative '../config/config'
+require_relative '../ext/util'
 
 module PacketsAtRest
   class PingableServer < Sinatra::Base
@@ -16,6 +21,12 @@ module PacketsAtRest
     set :dump_error, true
     set :raise_errors, true
     set :show_exceptions, true
+
+    PacketsAtRest::Plugin.all.each do |plugin|
+        b = "PacketsAtRest::#{plugin.id.to_s.camelcase}::Plugin"
+        use Object.const_get(b)
+    end
+
 
     get '/ping' do
       content_type :json
@@ -30,6 +41,17 @@ module PacketsAtRest
       rescue
         return internalerror 'there was a problem getting heartbeat'
       end
+    end
+
+    get '/plugins' do
+        content_type :json
+        begin
+            plugins = []
+            PacketsAtRest::Plugin.all.each {|plugin| plugins << JSON[plugin.to_json]}
+            return plugins.to_json
+        rescue
+            return internalerror 'there was a problem listing the plugins'
+        end
     end
 
     get '/*' do
