@@ -12,6 +12,28 @@ Packets at Rest is a RESTful web interface to pcap data on distributed network s
 [![Test Coverage](https://codeclimate.com/github/packets-at-rest/packets-at-rest/badges/coverage.svg)](https://codeclimate.com/github/packets-at-rest/packets-at-rest)
 [![Dependency Status](https://gemnasium.com/packets-at-rest/packets-at-rest.svg)](https://gemnasium.com/packets-at-rest/packets-at-rest)
 
+## Table of Contents
+
+- [packets-at-rest](#)
+	- [Build Status](#)
+	- [Environment, Dependencies, and Deployment Considerations](#)
+		- [Dependency Information](#)
+	- [Installation](#)
+		- [Node](#)
+		- [Setup Filer on each Node](#)
+		- [Collector](#)
+	- [The API](#)
+		- [Ping](#)
+		- [Status](#)
+		- [Node listing](#)
+		- [Keys](#)
+		- [PCAP Data](#)
+		- [PCAP vs PCAPNG](#)
+		- [Magic Number Matching](#)
+		- [Data Flow](#)
+	- [Plug-ins](#)
+	  - [API](#)
+
 ## Environment, Dependencies, and Deployment Considerations
 The Suggested operating system is FreeBSD for `node` for high efficiency capture.
 
@@ -331,7 +353,7 @@ Each plugin must register with the main application.
 
 The plugin class must be `Plugin`
 
-## API
+### API
 
 Collector
 
