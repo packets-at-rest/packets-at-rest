@@ -34,7 +34,7 @@ module PacketsAtRest
     use Warden::Manager do |config|
         config.scope_defaults :default,
         # Set your authorization strategy
-        strategies: [:admin_token, :node_access_token],
+        strategies: [:admin_access_token, :node_access_token],
         # Route to redirect to when warden.authenticate! returns a false answer.
         action: '/unauthenticated'
         config.failure_app = self
