@@ -11,6 +11,7 @@ module PacketsAtRest
 
             def lookup_nodes_by_api_key(api_key)
               begin
+                # TODO: make h a @@
                 h = JSON.parse(File.read(@apifile))
                 return h[api_key.to_s]
               rescue
@@ -35,6 +36,17 @@ module PacketsAtRest
               end
             end
 
+            def authorized_nodes(user_api_key)
+                accessible_nodes = lookup_nodes_by_api_key(user_api_key)
+
+                if accessible_nodes.include? "0"
+                  return lookup_nodeaddresses
+                else
+                  return lookup_nodeaddresses.keep_if { |k, v| accessible_nodes.include? k }
+                end
+            end
+
+            alias_method :valid_node?, :lookup_nodeaddress_by_id
         end
     end
 end

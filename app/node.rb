@@ -26,7 +26,7 @@ module PacketsAtRest
     end
 
 
-    get '/data.pcap' do
+    get '/data.pcap', allows: [:src_addr, :src_port, :dst_addr, :dst_port, :start_time, :end_time] do
       param :src_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
       param :src_port,           Integer, min: 1, max: 65536, required: true
       param :dst_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
@@ -61,7 +61,7 @@ module PacketsAtRest
       return [200, `#{command}`]
     end
 
-    get '/status' do
+    get '/status', allows: [] do
       content_type :json
       begin
         return {

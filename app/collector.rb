@@ -20,7 +20,7 @@ module PacketsAtRest
     helpers Sinatra::Param
 
     helpers do
-      def_delegators :@collector, :lookup_nodes_by_api_key, :lookup_nodeaddress_by_id, :lookup_nodeaddresses
+      def_delegators :@collector, :valid_node?, :lookup_nodes_by_api_key, :lookup_nodeaddress_by_id, :lookup_nodeaddresses
     end
 
     before do
@@ -36,32 +36,27 @@ module PacketsAtRest
       end
     end
 
-    get '/data.pcap' do
+    get '/data.pcap', allows: [:src_addr, :src_port, :dst_addr, :dst_port, :start_time, :end_time, :api_key, :node_id] do
+
+      param :src_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
+      param :src_port,           Integer, min: 1, max: 65536, required: true
+      param :dst_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
+      param :dst_port,           Integer, min: 1, max: 65536, required: true
+      param :start_time,         String, required: true
+      param :end_time,           String, required: true
+      param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+      param :node_id,             Integer, required: true
+
+
+      packet_keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
+      other_keys = ['api_key', 'node_id']
+
+      env['warden'].authenticate!(:node_access_token)
+      return forbidden 'api_key not allowed to request this resource' unless @collector.authorized_nodes(params['api_key']).include?(params['node_id'])
+      return badrequest 'unknown node' unless valid_node? params['node_id']
+
       begin
-
-        param :src_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
-        param :src_port,           Integer, min: 1, max: 65536, required: true
-        param :dst_addr,           String, format: /^[a-zA-Z0-9.:]+$/, required: true
-        param :dst_port,           Integer, min: 1, max: 65536, required: true
-        param :start_time,         String, required: true
-        param :end_time,           String, required: true
-        param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
-        param :node_id,             Integer, required: true
-
-
-        packet_keys = ['src_addr', 'src_port', 'dst_addr', 'dst_port', 'start_time', 'end_time']
-        other_keys = ['api_key', 'node_id']
-
-        nodes = lookup_nodes_by_api_key(params['api_key'])
-
-        if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
-          return forbidden 'api_key not allowed to request this resource'
-        end
-
         node_address = lookup_nodeaddress_by_id(params['node_id'])
-        if not node_address
-          return badrequest 'unknown node'
-        end
 
         query = (packet_keys << 'api_key').collect{ |k| "#{k}=#{params[k]}" }.join('&')
         uri = URI.encode("http://#{node_address}/data.pcap?#{query}")
@@ -78,92 +73,58 @@ module PacketsAtRest
       end
     end
 
-    get '/keys' do
+    get '/keys', allows: [:api_key] do
 
       param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+
+      # Allow admin user
+      env['warden'].authenticate!(:admin_access_token)
 
       content_type :json
 
       begin
-        nodes = lookup_nodes_by_api_key(params['api_key'])
-
-        if nodes.include? "0"
-          return JSON.parse(File.read(@collector.apifile)).to_json
-        else
-          return forbidden 'api_key not allowed to request this resource'
-        end
+        return JSON.parse(File.read(@collector.apifile)).to_json
       rescue
         return internalerror 'there was a problem looking up nodes'
       end
     end
 
-    get '/nodes/list' do
+    get '/nodes/list', allows: [:api_key] do
 
       param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+
+      # Allow any auth user
+      env['warden'].authenticate!(:node_access_token)
 
       content_type :json
 
       begin
-        nodes = lookup_nodes_by_api_key(params['api_key'])
-
-        if nodes.include? "0"
-          return JSON.parse(File.read(@collector.nodefile)).to_json
-        else
-          return lookup_nodeaddresses.keep_if { |k, v| nodes.include? k }.to_json
-        end
+        return @collector.authorized_nodes(params['api_key']).to_json
       rescue
         return internalerror 'there was a problem getting node list'
       end
     end
 
-    get '/nodes/:node_id/ping' do
+    get '/nodes/:node_id/:command', allows: [:api_key, :node_id, :command] do
 
       param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
-      param :node_id,             Integer, required: true
+      param :command,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
+      param :node_id,             Integer, transform: :to_s, required: true
 
       content_type :json
 
-      begin
-        nodes = lookup_nodes_by_api_key(params['api_key'])
+      authorized_proxy_commands = [:ping, :status, :plugins, :routes]
 
-        if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
-          return forbidden 'api_key not allowed to request this resource'
-        end
+      return badrequest 'this request is not supported' unless authorized_proxy_commands.include?(params['command'].to_sym)
 
-        node_address = lookup_nodeaddress_by_id(params['node_id'])
-        if not node_address
-          return badrequest 'unknown node'
-        end
-
-        uri = URI.encode("http://#{node_address}/ping")
-        RestClient.get(uri) do |response, request, result|
-          [response.code, response.body]
-        end
-      rescue
-        return internalerror 'there was a problem requesting from the node'
-      end
-    end
-
-    get '/nodes/:node_id/status' do
-
-      param :api_key,             String, format: /^[a-zA-Z0-9\-]+$/, required: true
-      param :node_id,             Integer, required: true
-
-      content_type :json
+      env['warden'].authenticate!(:node_access_token)
+      return forbidden 'api_key not allowed to request this resource' unless @collector.authorized_nodes(params['api_key']).include?(params['node_id'])
+      return badrequest 'unknown node' unless valid_node? params['node_id']
 
       begin
-        nodes = lookup_nodes_by_api_key(params['api_key'])
-
-        if nodes and !nodes.include? "0" and !nodes.include? params['node_id']
-          return forbidden 'api_key not allowed to request this resource'
-        end
-
         node_address = lookup_nodeaddress_by_id(params['node_id'])
-        if not node_address
-          return badrequest 'unknown node'
-        end
 
-        uri = URI.encode("http://#{node_address}/status")
+        uri = URI.encode("http://#{node_address}/#{params['command']}")
         RestClient.get(uri) do |response, request, result|
           [response.code, response.body]
         end

@@ -195,4 +195,7 @@ class Hash
   def compact!
     self.reject! { |_, value| value.nil? }
   end
+
+  alias_method :blank?, :empty?
+
 end

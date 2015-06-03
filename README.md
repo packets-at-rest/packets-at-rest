@@ -1,7 +1,7 @@
 # packets-at-rest
 
 [![GitHub release](https://img.shields.io/github/tag/packets-at-rest/packets-at-rest.svg)](https://github.com/packets-at-rest/packets-at-rest)
-[![API version](https://img.shields.io/badge/api-0.1.3-aa00aa.svg)](https://github.com/packets-at-rest/packets-at-rest/blob/master/lib/version.rb)
+[![API version](https://img.shields.io/badge/api-0.2.0-aa00aa.svg)](https://github.com/packets-at-rest/packets-at-rest/blob/master/lib/version.rb)
 
 Packets at Rest is a RESTful web interface to pcap data on distributed network sensors through the use of IPFIX flow tuples and simple API rolebased access controls.
 
@@ -11,28 +11,6 @@ Packets at Rest is a RESTful web interface to pcap data on distributed network s
 [![Code Climate](https://codeclimate.com/github/packets-at-rest/packets-at-rest/badges/gpa.svg)](https://codeclimate.com/github/packets-at-rest/packets-at-rest)
 [![Test Coverage](https://codeclimate.com/github/packets-at-rest/packets-at-rest/badges/coverage.svg)](https://codeclimate.com/github/packets-at-rest/packets-at-rest)
 [![Dependency Status](https://gemnasium.com/packets-at-rest/packets-at-rest.svg)](https://gemnasium.com/packets-at-rest/packets-at-rest)
-
-## Table of Contents
-
-- [packets-at-rest](#)
-	- [Build Status](#)
-	- [Environment, Dependencies, and Deployment Considerations](#)
-		- [Dependency Information](#)
-	- [Installation](#)
-		- [Node](#)
-		- [Setup Filer on each Node](#)
-		- [Collector](#)
-	- [The API](#)
-		- [Ping](#)
-		- [Status](#)
-		- [Node listing](#)
-		- [Keys](#)
-		- [PCAP Data](#)
-		- [PCAP vs PCAPNG](#)
-		- [Magic Number Matching](#)
-		- [Data Flow](#)
-	- [Plug-ins](#)
-	  - [API](#)
 
 ## Environment, Dependencies, and Deployment Considerations
 The Suggested operating system is FreeBSD for `node` for high efficiency capture.
@@ -322,20 +300,72 @@ Response headers include:
 
 PCAP files applications such as [Wireshark](https://www.wireshark.org/) can be associated to automagically open on download of pcapfile.
 
-### PCAP vs PCAPNG
+#### PCAP vs PCAPNG
 
 Standard pcap files with "pcapfile magic number = `\xd4\xc3\xb2\xa1`" have been around for many years. Newer [pcapng](https://wiki.wireshark.org/Development/PcapNg) files can be read by *wireshark*, *tcpdump*, etc.. but are not always available.
 
 Proper MIME type for standard PCAP
 `application/vnd.tcpdump.pcap; charset=binary`
 
-### Magic Number Matching
+#### Magic Number Matching
 
 Standard PCAP
 `tcpdump capture file (little-endian) [application/vnd.tcpdump.pcap]`
 
 NextGeneration PCAPs (.pcapng)
 `extended tcpdump capture file (little-endian) []`
+
+### Routes
+
+Self defining API. The API can provide some self defined feedback by accessing `routes`.
+Collector Routes
+
+`https://10.0.0.2/routes?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`
+
+```JSON
+[
+    (...)
+    [
+        "(?-mix:\A\/data(?:\.|%2[Ee])pcap\z)",
+        [ ]
+    ],
+    [
+        "(?-mix:\A\/keys\z)",
+        [ ]
+    ],
+    [
+        "(?-mix:\A\/nodes\/list\z)",
+        [ ]
+    ],
+    [
+        "(?-mix:\A\/nodes\/([^\/?#]+)\/([^\/?#]+)\z)",
+        [
+            "node_id",
+            "command"
+        ]
+    ]
+]
+```
+
+Node Routes
+
+`https://10.0.0.2/nodes/1/routes?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`
+
+```JSON
+[
+    (...)
+    [
+        "(?-mix:\A\/data(?:\.|%2[Ee])pcap\z)",
+        [ ]
+    ],
+    [
+        "(?-mix:\A\/status\z)",
+        [ ]
+    ]
+]
+```
+
+* This JSON output has been truncated for brevity. *
 
 ### Data Flow
 
@@ -346,27 +376,25 @@ NextGeneration PCAPs (.pcapng)
 
 Packets at REST supports plug-ins. Plugins should be installed into the `/plugins` dir.
 
-Each plugin must register with the main application.
+Each plugin must be explicitly required in the `config/initializers/03-require-plugins.rb`.
+
+This will "register" the plugin and its API extensions.
+
+```ruby
+require_relative '../../plugins/par-plugin-facter/init.rb'
+```
 
 * See (packets-at-rest/par_plugin_facter)[https://github.com/packets-at-rest/par_plugin_facter] for an example.
 * See plugins/README.md for more information.
 
 The plugin class must be `Plugin`
 
-### API
+### API Extensions
 
-Collector
+Both the Collector and the Node can display which plugins have registered on the server. Note: This allows for different plugins on different nodes, as well as different collectors.
 
-`https://10.0.0.2/plugins`
-
-Access Controls:
-
-~~https://10.0.0.2/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66~~
-~~https://10.0.0.2/nodes/1/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66~~
-
-Node
-
-`https://10.0.0.90/plugins`
+* `https://10.0.0.2/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`
+* `https://10.0.0.2/nodes/1/plugins?api_key=54b22f56-9a84-4893-bc70-332e3b5ded66`
 
 ```json
 [

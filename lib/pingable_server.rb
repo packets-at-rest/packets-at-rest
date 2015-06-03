@@ -3,10 +3,12 @@ require 'sys/uptime'
 
 # Gems
 require 'json'
+require 'warden'
 
 require 'sinatra/base'
 require 'sinatra/param'
 require 'sinatra-initializers'
+require 'sinatra/strong-params'
 
 # Require Local
 require_relative '../lib/version'
@@ -16,6 +18,7 @@ require_relative '../ext/util'
 module PacketsAtRest
   class PingableServer < Sinatra::Base
     register Sinatra::Initializers
+    register Sinatra::StrongParams
 
     set :logging, true
     set :dump_error, true
@@ -27,8 +30,40 @@ module PacketsAtRest
         use Object.const_get(b)
     end
 
+    # Configure Warden
+    use Warden::Manager do |config|
+        config.scope_defaults :default,
+        # Set your authorization strategy
+        strategies: [:admin_token, :node_access_token],
+        # Route to redirect to when warden.authenticate! returns a false answer.
+        action: '/unauthenticated'
+        config.failure_app = self
+    end
 
-    get '/ping' do
+    Warden::Manager.before_failure do |env,opts|
+        env['REQUEST_METHOD'] = 'POST'
+    end
+
+    get '/routes', allows: [:api_key] do
+        env['warden'].authenticate!(:node_access_token)
+
+        data = PacketsAtRest::PingableServer.routes["GET"].collect{|a| a[0..1]}
+
+        if PacketsAtRest::ROLE == :collector
+            data += PacketsAtRest::Collector.routes["GET"].collect{|a| a[0..1]}
+            data = data.to_json
+        elsif PacketsAtRest::ROLE == :node
+            data += PacketsAtRest::Node.routes["GET"].collect{|a| a[0..1]}
+            data = data.to_json
+        else
+            data = data.to_json
+        end
+
+        content_type :json
+        return data
+    end
+
+    get '/ping', allows: [] do
       content_type :json
       begin
         return {
@@ -43,7 +78,9 @@ module PacketsAtRest
       end
     end
 
-    get '/plugins' do
+    get '/plugins', allows: [] do
+        env['warden'].authenticate!(:node_access_token)
+
         content_type :json
         begin
             plugins = []
@@ -54,7 +91,20 @@ module PacketsAtRest
         end
     end
 
-    get '/*' do
+    # This is the protected route, without the proper access token you'll be redirected.
+    get '/protected', allows: [:api_key] do
+        env['warden'].authenticate!(:admin_access_token)
+
+        content_type :json
+        { :message => "This is an authenticated request!" }.to_json
+    end
+
+    # This is the route that unauthorized requests gets redirected to.
+    post '/unauthenticated', allows: [] do
+        unauthorized "Sorry, this request can not be authenticated. Try again."
+    end
+
+    get '/*', allows: [] do
       return badrequest 'this request is not supported'
     end
 
