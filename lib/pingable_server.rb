@@ -27,7 +27,7 @@ module PacketsAtRest
 
     PacketsAtRest::Plugin.all.each do |plugin|
         b = "PacketsAtRest::#{plugin.id.to_s.camelcase}::Plugin"
-        use Object.const_get(b)
+        use Object.const_get19(b)
     end
 
     # Configure Warden
