@@ -9,7 +9,7 @@ class Object
       return Object.const_get(str)
     else
       str.split('::').inject(Object) do |mod, class_name|
-        return mod.const_get(class_name)
+        mod.const_get(class_name)
       end
     end
 
