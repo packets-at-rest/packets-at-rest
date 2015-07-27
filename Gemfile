@@ -25,6 +25,7 @@ group :coverage do
 end
 
 group :test do
+    gem "minitest", '~> 5.6', require: nil
     gem 'bump', '~> 0.3', require: nil
     gem 'rake', require: nil
     gem 'rack-test', require: nil
