@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+gem 'rake', '~> 10.4.2'
 gem 'rack', '~> 1.6.0'
 gem 'json', '~> 1.8.2'
 gem 'chronic', '~> 0.10.2'
