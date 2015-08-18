@@ -52,7 +52,7 @@ module PacketsAtRest
       other_keys = ['api_key', 'node_id']
 
       env['warden'].authenticate!(:node_access_token)
-      return forbidden 'api_key not allowed to request this resource' unless @collector.authorized_nodes(params['api_key']).include?(params['node_id'])
+      return forbidden 'api_key not allowed to request this resource' unless @collector.authorized_nodes(params['api_key']).include?(params['node_id'].to_s)
       return badrequest 'unknown node' unless valid_node? params['node_id']
 
       begin
