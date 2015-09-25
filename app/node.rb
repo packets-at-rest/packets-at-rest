@@ -5,6 +5,7 @@ require 'forwardable'
 require 'chronic'
 require 'json'
 require 'yell'
+require 'facets'
 
 # Local Files
 require_relative '../lib/pingable_server'

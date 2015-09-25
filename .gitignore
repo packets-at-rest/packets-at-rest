@@ -10,6 +10,8 @@ InstalledFiles
 _yardoc
 coverage
 
+production*.log
+
 config.ru
 config/*.conf
 config/*.yml

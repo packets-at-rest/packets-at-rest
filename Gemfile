@@ -10,7 +10,7 @@ gem 'sinatra-initializers', '~> 0.1.4'
 gem "sinatra-param", require: "sinatra/param"
 gem 'sinatra-strong-params', :require => 'sinatra/strong-params'
 gem 'alpaca'
-
+gem 'facets'
 gem 'yell'
 gem 'warden'
 
