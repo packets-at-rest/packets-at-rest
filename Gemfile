@@ -11,6 +11,7 @@ gem "sinatra-param", require: "sinatra/param"
 gem 'sinatra-strong-params', :require => 'sinatra/strong-params'
 gem 'alpaca'
 
+gem 'yell'
 gem 'warden'
 
 group :thin do

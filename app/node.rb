@@ -4,6 +4,7 @@ require 'forwardable'
 # Gems
 require 'chronic'
 require 'json'
+require 'yell'
 
 # Local Files
 require_relative '../lib/pingable_server'
@@ -23,6 +24,11 @@ module PacketsAtRest
 
     before do
       @node = PacketsAtRest::Controllers::Node.new
+      @logger = Yell.new do |l|
+        l.level = 'gte.info' # will only pass :info and above to the adapters
+        l.adapter :datefile, 'production-yell.log', level: 'lte.warn' # anything lower or equal to :warn
+        l.adapter :datefile, 'error-yell.log', level: 'gte.error' # anything greater or equal to :error
+      end
     end
 
 
@@ -50,10 +56,13 @@ module PacketsAtRest
 
 
       command = "#{PRINTF} \"#{files.join('\n')}\\n\" | #{TCPDUMP} -V - -w - \"#{bpf_filter}\" 2> /dev/null"
+      @logger.warn command
 
       puts command unless PacketsAtRest::ROLE == :unit_test
 
       if files.empty?
+        @logger.warn 'no capture data for that timeframe'
+        @logger.warn "#{start_dt}, #{end_dt}"
         return notfound 'no capture data for that timeframe'
       end
 
