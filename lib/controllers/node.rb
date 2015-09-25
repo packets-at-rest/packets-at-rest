@@ -25,16 +25,13 @@ module PacketsAtRest
                 while !File.directory?(dirs.first) do
                     start_dt = start_dt.less(1, :hour)
                     @start_d, @adj_start_dt = _calculate_adjusted_start_d(start_dt)
+                    dirs = ["#{@filerdir}/#{@adj_start_dt.year}/#{@adj_start_dt.month.pad2}/#{@adj_start_dt.day.pad2}/#{@adj_start_dt.hour.pad2}/"]
 
-                    (@adj_start_dt.hour .. @adj_end_dt.hour).each do |hour|
-                      dirs << "#{@filerdir}/#{@adj_start_dt.year}/#{@adj_start_dt.month.pad2}/#{@adj_start_dt.day.pad2}/#{hour.pad2}/"
-                    end
-
-                    # Dont go down an infinite hole.
+                    # Dont go down an infinite hole. Stop at 00. Hour
                     break if @adj_start_dt.hour == 0
-
                 end
 
+                # Only search the first one because the others are bogus
                 Dir["#{dirs.first}/*"].sort.each do |filepath|
                   files << filepath if _within_time_window?(filepath)
                 end
